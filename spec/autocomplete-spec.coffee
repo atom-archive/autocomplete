@@ -1,6 +1,6 @@
 $ = require 'jquery'
-AutocompleteView = require 'autocomplete/lib/autocomplete-view'
-Autocomplete = require 'autocomplete/lib/autocomplete'
+AutocompleteView = require '../lib/autocomplete-view'
+Autocomplete = require '../lib/autocomplete'
 Buffer = require 'text-buffer'
 Editor = require 'editor'
 RootView = require 'root-view'
@@ -306,7 +306,7 @@ describe "AutocompleteView", ->
 
     describe "when text is removed from the mini-editor", ->
       it "reloads the match list based on the mini-editor's text", ->
-        editor.getBuffer().insert([10,0] ,"t")
+        editor.getBuffer().insert([10,0], "t")
         editor.setCursorBufferPosition([10,0])
         autocomplete.attach()
 
