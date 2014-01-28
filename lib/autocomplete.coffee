@@ -1,25 +1,20 @@
 {_} = require 'atom'
-
-AutocompleteView = require './autocomplete-view'
+AutocompleteView = deferredRequire './autocomplete-view'
 
 module.exports =
   configDefaults:
     includeCompletionsFromAllBuffers: false
 
-  autocompleteViews: []
-  editorSubscription: null
+  autocompleteViews: {}
+  commandSubscription: null
 
   activate: ->
-    @editorSubscription = atom.workspaceView.eachEditorView (editor) =>
-      if editor.attached and not editor.mini
-        autocompleteView = new AutocompleteView(editor)
-        editor.on 'editor:will-be-removed', =>
-          autocompleteView.remove() unless autocompleteView.hasParent()
-          _.remove(@autocompleteViews, autocompleteView)
-        @autocompleteViews.push(autocompleteView)
+    @commandSubscription = atom.workspaceView.command 'autocomplete:attach', '.editor:not(.mini)', =>
+      editor = atom.workspaceView.getActiveView()
+      @autocompleteViews[editor.id] ?= new AutocompleteView(editor, this)
+      @autocompleteViews[editor.id].attach()
 
   deactivate: ->
-    @editorSubscription?.off()
-    @editorSubscription = null
-    @autocompleteViews.forEach (autocompleteView) -> autocompleteView.remove()
-    @autocompleteViews = []
+    @commandSubscription.off()
+    view.remove() for editorId, view of @autocompleteViews
+    @autocompleteViews = {}
