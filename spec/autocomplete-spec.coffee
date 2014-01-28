@@ -8,28 +8,6 @@ describe "Autocomplete", ->
     atom.workspaceView.openSync('sample.js')
     atom.workspaceView.simulateDomAttachment()
 
-  describe "@activate()", ->
-    it "activates autocomplete on all existing and future editors (but not on autocomplete's own mini editor)", ->
-      spyOn(AutocompleteView.prototype, 'initialize').andCallThrough()
-      autocompletePackage = atom.packages.activatePackage("autocomplete")
-      expect(AutocompleteView.prototype.initialize).not.toHaveBeenCalled()
-
-      leftEditor = atom.workspaceView.getActiveView()
-      rightEditor = leftEditor.splitRight()
-
-      leftEditor.trigger 'autocomplete:attach'
-      expect(leftEditor.find('.autocomplete')).toExist()
-      expect(rightEditor.find('.autocomplete')).not.toExist()
-
-      expect(AutocompleteView.prototype.initialize).toHaveBeenCalled()
-
-      autoCompleteView = leftEditor.find('.autocomplete').view()
-      autoCompleteView.trigger 'core:cancel'
-      expect(leftEditor.find('.autocomplete')).not.toExist()
-
-      rightEditor.trigger 'autocomplete:attach'
-      expect(rightEditor.find('.autocomplete')).toExist()
-
   describe "@deactivate()", ->
     it "removes all autocomplete views and doesn't create new ones when new editors are opened", ->
       atom.packages.activatePackage('autocomplete')

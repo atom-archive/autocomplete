@@ -3,11 +3,12 @@
   "version": "0.20.0",
   "main": "./lib/autocomplete",
   "description": "Display possible completions from the current editor with `ctrl-space`.",
-  "activationEvents": {
-    "autocomplete:attach": ".editor"
-  },
   "repository": "https://github.com/atom/autocomplete",
   "engines": {
     "atom": "*"
+  },
+  "dependencies": {
+    "emissary": "~1.0.0",
+    "deferred-require": "~0.4.0"
   }
 }
