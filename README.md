@@ -6,7 +6,7 @@ Looking to use a different keybinding? Copy the following to your
 `~/.atom/keymap.cson` to tweak:
 
 ```coffee
-'.editor':
+'.active.pane':
   'ctrl-space': 'autocomplete:toggle'
 ```
 
