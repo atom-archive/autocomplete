@@ -9,6 +9,7 @@ describe "Autocomplete", ->
     atom.workspaceView = new WorkspaceView
     atom.workspaceView.openSync('sample.js')
     atom.workspaceView.simulateDomAttachment()
+
     activationPromise = atom.packages.activatePackage('autocomplete')
 
   describe "@activate()", ->
@@ -61,6 +62,11 @@ describe "AutocompleteView", ->
     {editor} = editorView
     autocomplete = new AutocompleteView(editorView)
     miniEditor = autocomplete.filterEditorView
+    spyOn(atom.workspace, "getActiveEditor").andCallFake ->
+      return {
+      getGrammar: ->
+        return {keywords:"function funtor"}
+      }
 
   describe 'autocomplete:toggle event', ->
     it "shows autocomplete view and focuses its mini-editor", ->
@@ -116,7 +122,7 @@ describe "AutocompleteView", ->
 
         expect(autocomplete.list.find('li:eq(0)')).toHaveText('0')
         expect(autocomplete.list.find('li:eq(1)')).toHaveText('1')
-        expect(autocomplete.list.find('li').length).toBe 22
+        expect(autocomplete.list.find('li').length).toBe 23
 
       it "autocompletes word and replaces case of prefix with case of word", ->
         editor.getBuffer().insert([10,0] ,"extra:SO:extra")
@@ -126,6 +132,19 @@ describe "AutocompleteView", ->
         expect(editor.lineForBufferRow(10)).toBe "extra:sort:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,10]
         expect(editor.getSelection().isEmpty()).toBeTruthy()
+
+      it "shows all words when there is no prefix or suffix", ->
+        editor.getBuffer().insert([10,0] ,"extra:f:extra")
+        editor.setCursorBufferPosition([10,7])
+        autocomplete.attach()
+
+        expect(editor.lineForBufferRow(10)).toBe "extra:function:extra"
+        expect(editor.getCursorBufferPosition()).toEqual [10,14]
+        expect(editor.getSelection().getBufferRange()).toEqual [[10,7], [10,14]]
+
+        expect(autocomplete.list.find('li').length).toBe 2
+        expect(autocomplete.list.find('li:eq(0)')).toHaveText('function')
+        expect(autocomplete.list.find('li:eq(1)')).toHaveText('funtor')
 
       describe "when `autocomplete.includeCompletionsFromAllBuffers` is true", ->
         it "shows words from all open buffers", ->
@@ -138,6 +157,8 @@ describe "AutocompleteView", ->
           expect(autocomplete.list.find('li').length).toBe 2
           expect(autocomplete.list.find('li:eq(0)')).toHaveText('Some')
           expect(autocomplete.list.find('li:eq(1)')).toHaveText('sort')
+
+      describe "when grammar provided keywords", ->
 
     describe "when text is selected", ->
       it 'autocompletes word when there is only a prefix', ->

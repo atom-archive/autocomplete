@@ -72,6 +72,8 @@ class AutocompleteView extends SelectListView
     else
       buffers = [@currentBuffer]
     matches = []
+    keywords = atom.workspace.getActiveEditor().getGrammar().keywords
+    matches.push(keywords.match(this.wordRegex)) if keywords?
     matches.push(buffer.getText().match(@wordRegex)) for buffer in buffers
     wordHash[word] ?= true for word in _.flatten(matches)
     wordHash[word] ?= true for word in @getCompletionsForCursorScope()
