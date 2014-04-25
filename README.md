@@ -1,4 +1,4 @@
-# Autocomplete package
+# Autocomplete package [![Build Status](https://travis-ci.org/atom/autocomplete.svg?branch=master)](https://travis-ci.org/atom/autocomplete)
 
 View and insert possible completions in the editor using `ctrl-space`.
 
