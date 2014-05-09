@@ -103,6 +103,8 @@ class AutocompleteView extends SelectListView
     @originalSelectionBufferRanges = @editor.getSelections().map (selection) -> selection.getBufferRange()
     @originalCursorPosition = @editor.getCursorScreenPosition()
 
+    return @cancel() unless @allPrefixAndSuffixOfSelectionsMatch()
+
     @buildWordList()
     matches = @findMatchesForCurrentSelection()
     @setItems(matches)
@@ -174,6 +176,17 @@ class AutocompleteView extends SelectListView
         suffix = match[0][suffixOffset..] if range.end.isGreaterThan(selectionRange.end)
 
     {prefix, suffix}
+
+  allPrefixAndSuffixOfSelectionsMatch: ->
+    {prefix, suffix} = {}
+
+    @editor.getSelections().every (selection) =>
+      [previousPrefix, previousSuffix] = [prefix, suffix]
+
+      {prefix, suffix} = @prefixAndSuffixOfSelection(selection)
+
+      return true unless previousPrefix? and previousSuffix?
+      prefix is previousPrefix and suffix is previousSuffix
 
   afterAttach: (onDom) ->
     if onDom
