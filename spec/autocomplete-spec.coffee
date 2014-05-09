@@ -183,6 +183,16 @@ describe "AutocompleteView", ->
         expect(editor.getSelection().isEmpty()).toBeTruthy()
         expect(editorView.find('.autocomplete')).not.toExist()
 
+      describe "when many ranges are selected", ->
+        it 'replaces selection with selected match, moves the cursor to the end of the match, and removes the autocomplete menu', ->
+            editor.getBuffer().insert([10,0] ,"sort:extra:sort")
+            editor.setSelectedBufferRanges [[[10,1], [10,3]], [[10,12], [10,14]]]
+            autocomplete.attach()
+
+            expect(editor.lineForBufferRow(10)).toBe "shift:extra:shift"
+            expect(editor.getSelections().length).toEqual(2)
+            expect(editorView.find('.autocomplete')).not.toExist()
+
     describe "when the editor is scrolled to the right", ->
       it "does not scroll it to the left", ->
         editorView.width(300)
