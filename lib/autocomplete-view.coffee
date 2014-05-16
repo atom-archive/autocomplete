@@ -113,7 +113,7 @@ class AutocompleteView extends SelectListView
       @focusFilterEditor()
 
   setPosition: ->
-    { left, top } = @editorView.pixelPositionForScreenPosition(@originalCursorPosition)
+    {left, top} = @editorView.pixelPositionForScreenPosition(@originalCursorPosition)
     height = @outerHeight()
     width = @outerWidth()
     potentialTop = top + @editorView.lineHeight
