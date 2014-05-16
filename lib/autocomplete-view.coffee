@@ -6,7 +6,7 @@ class AutocompleteView extends SelectListView
   currentBuffer: null
   wordList: null
   wordRegex: /\w+/g
-  originalSelectionBufferRange: null
+  originalSelectionBufferRanges: null
   originalCursorPosition: null
   aboveCursor: false
 
@@ -80,26 +80,30 @@ class AutocompleteView extends SelectListView
       word1.toLowerCase().localeCompare(word2.toLowerCase())
 
   confirmed: (match) ->
-    @editor.getSelection().clear()
+    @editor.getSelections().forEach (selection) -> selection.clear()
+
     @cancel()
     return unless match
     @replaceSelectedTextWithMatch match
-    position = @editor.getCursorBufferPosition()
-    @editor.setCursorBufferPosition([position.row, position.column + match.suffix.length])
+    @editor.getCursors().forEach (cursor) ->
+      position = cursor.getBufferPosition()
+      cursor.setBufferPosition([position.row, position.column + match.suffix.length])
 
   cancelled: ->
     super
 
     @editor.abortTransaction()
-    @editor.setSelectedBufferRange(@originalSelectionBufferRange)
+    @editor.setSelectedBufferRanges(@originalSelectionBufferRanges)
     @editorView.focus()
 
   attach: ->
     @editor.beginTransaction()
 
     @aboveCursor = false
-    @originalSelectionBufferRange = @editor.getSelection().getBufferRange()
+    @originalSelectionBufferRanges = @editor.getSelections().map (selection) -> selection.getBufferRange()
     @originalCursorPosition = @editor.getCursorScreenPosition()
+
+    return @cancel() unless @allPrefixAndSuffixOfSelectionsMatch()
 
     @buildWordList()
     matches = @findMatchesForCurrentSelection()
@@ -141,18 +145,24 @@ class AutocompleteView extends SelectListView
       {word, prefix, suffix} for word in @wordList
 
   replaceSelectedTextWithMatch: (match) ->
-    selection = @editor.getSelection()
-    startPosition = selection.getBufferRange().start
-    buffer = @editor.getBuffer()
+    newSelectedBufferRanges = []
+    selections = @editor.getSelections()
 
-    selection.deleteSelectedText()
-    cursorPosition = @editor.getCursorBufferPosition()
-    buffer.delete(Range.fromPointWithDelta(cursorPosition, 0, match.suffix.length))
-    buffer.delete(Range.fromPointWithDelta(cursorPosition, 0, -match.prefix.length))
+    selections.forEach (selection, i) =>
+      startPosition = selection.getBufferRange().start
+      buffer = @editor.getBuffer()
+
+      selection.deleteSelectedText()
+      cursorPosition = @editor.getCursors()[i].getBufferPosition()
+      buffer.delete(Range.fromPointWithDelta(cursorPosition, 0, match.suffix.length))
+      buffer.delete(Range.fromPointWithDelta(cursorPosition, 0, -match.prefix.length))
+
+      infixLength = match.word.length - match.prefix.length - match.suffix.length
+
+      newSelectedBufferRanges.push([startPosition, [startPosition.row, startPosition.column + infixLength]])
+
     @editor.insertText(match.word)
-
-    infixLength = match.word.length - match.prefix.length - match.suffix.length
-    @editor.setSelectedBufferRange([startPosition, [startPosition.row, startPosition.column + infixLength]])
+    @editor.setSelectedBufferRanges(newSelectedBufferRanges)
 
   prefixAndSuffixOfSelection: (selection) ->
     selectionRange = selection.getBufferRange()
@@ -170,6 +180,17 @@ class AutocompleteView extends SelectListView
         suffix = match[0][suffixOffset..] if range.end.isGreaterThan(selectionRange.end)
 
     {prefix, suffix}
+
+  allPrefixAndSuffixOfSelectionsMatch: ->
+    {prefix, suffix} = {}
+
+    @editor.getSelections().every (selection) =>
+      [previousPrefix, previousSuffix] = [prefix, suffix]
+
+      {prefix, suffix} = @prefixAndSuffixOfSelection(selection)
+
+      return true unless previousPrefix? and previousSuffix?
+      prefix is previousPrefix and suffix is previousSuffix
 
   afterAttach: (onDom) ->
     if onDom

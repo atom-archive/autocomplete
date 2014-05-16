@@ -139,6 +139,35 @@ describe "AutocompleteView", ->
           expect(autocomplete.list.find('li:eq(0)')).toHaveText('Some')
           expect(autocomplete.list.find('li:eq(1)')).toHaveText('sort')
 
+      describe 'where many cursors are defined', ->
+        it 'autocompletes word when there is only a prefix', ->
+          editor.getBuffer().insert([10,0] ,"s:extra:s")
+          editor.setSelectedBufferRanges([[[10,1],[10,1]], [[10,9],[10,9]]])
+          autocomplete.attach()
+
+          expect(editor.lineForBufferRow(10)).toBe "shift:extra:shift"
+          expect(editor.getCursorBufferPosition()).toEqual [10,12]
+          expect(editor.getSelection().getBufferRange()).toEqual [[10,8], [10,12]]
+
+          expect(editor.getSelections().length).toEqual(2)
+
+          expect(autocomplete.list.find('li').length).toBe 2
+          expect(autocomplete.list.find('li:eq(0)')).toHaveText('shift')
+          expect(autocomplete.list.find('li:eq(1)')).toHaveText('sort')
+
+        describe 'where text differs between cursors', ->
+          it 'cancels the autocomplete', ->
+            editor.getBuffer().insert([10,0] ,"s:extra:a")
+            editor.setSelectedBufferRanges([[[10,1],[10,1]], [[10,9],[10,9]]])
+            autocomplete.attach()
+
+            expect(editor.lineForBufferRow(10)).toBe "s:extra:a"
+            expect(editor.getSelections().length).toEqual(2)
+            expect(editor.getSelections()[0].getBufferRange()).toEqual [[10,1], [10,1]]
+            expect(editor.getSelections()[1].getBufferRange()).toEqual [[10,9], [10,9]]
+
+            expect(editorView.find('.autocomplete')).not.toExist()
+
     describe "when text is selected", ->
       it 'autocompletes word when there is only a prefix', ->
         editor.getBuffer().insert([10,0] ,"extra:sort:extra")
@@ -182,6 +211,16 @@ describe "AutocompleteView", ->
         expect(editor.getCursorBufferPosition()).toEqual [10,11]
         expect(editor.getSelection().isEmpty()).toBeTruthy()
         expect(editorView.find('.autocomplete')).not.toExist()
+
+      describe "when many ranges are selected", ->
+        it 'replaces selection with selected match, moves the cursor to the end of the match, and removes the autocomplete menu', ->
+            editor.getBuffer().insert([10,0] ,"sort:extra:sort")
+            editor.setSelectedBufferRanges [[[10,1], [10,3]], [[10,12], [10,14]]]
+            autocomplete.attach()
+
+            expect(editor.lineForBufferRow(10)).toBe "shift:extra:shift"
+            expect(editor.getSelections().length).toEqual(2)
+            expect(editorView.find('.autocomplete')).not.toExist()
 
     describe "when the editor is scrolled to the right", ->
       it "does not scroll it to the left", ->
