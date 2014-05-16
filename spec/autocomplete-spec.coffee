@@ -72,6 +72,16 @@ describe "AutocompleteView", ->
       expect(autocomplete.editor.isFocused).toBeFalsy()
       expect(autocomplete.filterEditorView.isFocused).toBeTruthy()
 
+    describe "when the editor is empty", ->
+      it "displays no matches", ->
+        editor.setText('')
+        expect(editorView.find('.autocomplete')).not.toExist()
+
+        editorView.trigger "autocomplete:toggle"
+        expect(editor.getText()).toBe ''
+        expect(editorView.find('.autocomplete')).toExist()
+        expect(autocomplete.list.find('li').length).toBe 0
+
     describe "when no text is selected", ->
       it 'autocompletes word when there is only a prefix', ->
         editor.getBuffer().insert([10,0] ,"extra:s:extra")
@@ -214,13 +224,13 @@ describe "AutocompleteView", ->
 
       describe "when many ranges are selected", ->
         it 'replaces selection with selected match, moves the cursor to the end of the match, and removes the autocomplete menu', ->
-            editor.getBuffer().insert([10,0] ,"sort:extra:sort")
-            editor.setSelectedBufferRanges [[[10,1], [10,3]], [[10,12], [10,14]]]
-            autocomplete.attach()
+          editor.getBuffer().insert([10,0] ,"sort:extra:sort")
+          editor.setSelectedBufferRanges [[[10,1], [10,3]], [[10,12], [10,14]]]
+          autocomplete.attach()
 
-            expect(editor.lineForBufferRow(10)).toBe "shift:extra:shift"
-            expect(editor.getSelections().length).toEqual(2)
-            expect(editorView.find('.autocomplete')).not.toExist()
+          expect(editor.lineForBufferRow(10)).toBe "shift:extra:shift"
+          expect(editor.getSelections().length).toEqual(2)
+          expect(editorView.find('.autocomplete')).not.toExist()
 
     describe "when the editor is scrolled to the right", ->
       it "does not scroll it to the left", ->

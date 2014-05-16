@@ -73,8 +73,8 @@ class AutocompleteView extends SelectListView
       buffers = [@currentBuffer]
     matches = []
     matches.push(buffer.getText().match(@wordRegex)) for buffer in buffers
-    wordHash[word] ?= true for word in _.flatten(matches)
-    wordHash[word] ?= true for word in @getCompletionsForCursorScope()
+    wordHash[word] ?= true for word in _.flatten(matches) when word
+    wordHash[word] ?= true for word in @getCompletionsForCursorScope() when word
 
     @wordList = Object.keys(wordHash).sort (word1, word2) ->
       word1.toLowerCase().localeCompare(word2.toLowerCase())
