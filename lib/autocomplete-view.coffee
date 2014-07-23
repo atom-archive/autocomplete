@@ -3,6 +3,7 @@ _ = require 'underscore-plus'
 
 module.exports =
 class AutocompleteView extends SelectListView
+  subscriptions: null
   currentBuffer: null
   wordList: null
   wordRegex: /\w+/g
@@ -28,14 +29,15 @@ class AutocompleteView extends SelectListView
   handleEvents: ->
     @list.on 'mousewheel', (event) -> event.stopPropagation()
 
+    @subscriptions = {}
     @editorView.on 'editor:path-changed', => @setCurrentBuffer(@editor.getBuffer())
-    @editorView.command 'autocomplete:toggle', =>
+    @subscriptions['autocomplete:toggle'] = @editorView.command 'autocomplete:toggle', =>
       if @hasParent()
         @cancel()
       else
         @attach()
-    @editorView.command 'autocomplete:next', => @selectNextItemView()
-    @editorView.command 'autocomplete:previous', => @selectPreviousItemView()
+    @subscriptions['autocomplete:next'] = @editorView.command 'autocomplete:next', => @selectNextItemView()
+    @subscriptions['autocomplete:previous'] = @editorView.command 'autocomplete:previous', => @selectPreviousItemView()
 
     @filterEditorView.preempt 'textInput', ({originalEvent}) =>
       text = originalEvent.data
@@ -115,6 +117,11 @@ class AutocompleteView extends SelectListView
       @editorView.appendToLinesView(this)
       @setPosition()
       @focusFilterEditor()
+
+  destroy: ->
+    for key, subscription of @subscriptions
+      subscription.off key
+    @remove()
 
   setPosition: ->
     {left, top} = @editorView.pixelPositionForScreenPosition(@originalCursorPosition)
