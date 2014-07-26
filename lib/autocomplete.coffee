@@ -13,7 +13,7 @@ module.exports =
       if editor.attached and not editor.mini
         autocompleteView = new AutocompleteView(editor)
         editor.on 'editor:will-be-removed', =>
-          autocompleteView.destroy()
+          autocompleteView.destroy() unless autocompleteView.hasParent()
           _.remove(@autocompleteViews, autocompleteView)
         @autocompleteViews.push(autocompleteView)
 
