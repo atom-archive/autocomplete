@@ -7,9 +7,13 @@ describe "Autocomplete", ->
 
   beforeEach ->
     atom.workspaceView = new WorkspaceView
-    atom.workspaceView.openSync('sample.js')
-    atom.workspaceView.simulateDomAttachment()
-    activationPromise = atom.packages.activatePackage('autocomplete')
+
+    waitsForPromise ->
+      atom.workspace.open('sample.js')
+
+    runs ->
+      atom.workspaceView.simulateDomAttachment()
+      activationPromise = atom.packages.activatePackage('autocomplete')
 
   describe "@activate()", ->
     it "activates autocomplete on all existing and future editors (but not on autocomplete's own mini editor)", ->
@@ -57,10 +61,15 @@ describe "AutocompleteView", ->
 
   beforeEach ->
     atom.workspaceView = new WorkspaceView
-    editorView = new EditorView(editor: atom.project.openSync('sample.js'))
-    {editor} = editorView
-    autocomplete = new AutocompleteView(editorView)
-    miniEditor = autocomplete.filterEditorView
+
+    waitsForPromise ->
+      atom.workspace.open('sample.js').then (editor) ->
+        editorView = new EditorView({editor})
+
+    runs ->
+      {editor} = editorView
+      autocomplete = new AutocompleteView(editorView)
+      miniEditor = autocomplete.filterEditorView
 
   describe 'autocomplete:toggle event', ->
     it "shows autocomplete view and focuses its mini-editor", ->
@@ -140,14 +149,18 @@ describe "AutocompleteView", ->
       describe "when `autocomplete.includeCompletionsFromAllBuffers` is true", ->
         it "shows words from all open buffers", ->
           atom.config.set('autocomplete.includeCompletionsFromAllBuffers', true)
-          atom.project.openSync('sample.txt')
-          editor.getBuffer().insert([10,0] ,"extra:SO:extra")
-          editor.setCursorBufferPosition([10,8])
-          autocomplete.attach()
 
-          expect(autocomplete.list.find('li').length).toBe 2
-          expect(autocomplete.list.find('li:eq(0)')).toHaveText('Some')
-          expect(autocomplete.list.find('li:eq(1)')).toHaveText('sort')
+          waitsForPromise ->
+            atom.workspace.open('sample.txt')
+
+          runs ->
+            editor.getBuffer().insert([10,0] ,"extra:SO:extra")
+            editor.setCursorBufferPosition([10,8])
+            autocomplete.attach()
+
+            expect(autocomplete.list.find('li').length).toBe 2
+            expect(autocomplete.list.find('li:eq(0)')).toHaveText('Some')
+            expect(autocomplete.list.find('li:eq(1)')).toHaveText('sort')
 
       describe 'where many cursors are defined', ->
         it 'autocompletes word when there is only a prefix', ->
@@ -507,11 +520,16 @@ describe "AutocompleteView", ->
     expect(autocomplete.list.prop('scrollWidth')).toBe autocomplete.list.width()
 
   it "includes completions for the scope's completion preferences", ->
+    cssEditorView = null
+
     waitsForPromise ->
       atom.packages.activatePackage('language-css')
 
+    waitsForPromise ->
+      atom.workspace.open('css.css').then (editor) ->
+        cssEditorView = new EditorView({editor})
+
     runs ->
-      cssEditorView = new EditorView(editor: atom.project.openSync('css.css'))
       cssEditor = cssEditorView.editor
       autocomplete = new AutocompleteView(cssEditorView)
 
