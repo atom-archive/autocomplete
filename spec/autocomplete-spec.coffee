@@ -392,10 +392,10 @@ describe "AutocompleteView", ->
         autocomplete.attach()
 
         expect(autocomplete.list.find('li').length).toBe 8
-        miniEditor.textInput('c')
+        miniEditor.getModel().insertText('c')
         window.advanceClock(autocomplete.inputThrottle)
         expect(autocomplete.list.find('li').length).toBe 3
-        miniEditor.editor.backspace()
+        miniEditor.getModel().backspace()
         window.advanceClock(autocomplete.inputThrottle)
         expect(autocomplete.list.find('li').length).toBe 8
 
@@ -406,7 +406,7 @@ describe "AutocompleteView", ->
         autocomplete.attach()
 
         expect(autocomplete.list.find('li').length).toBe 8
-        miniEditor.textInput('i')
+        miniEditor.getModel().insertText('i')
         window.advanceClock(autocomplete.inputThrottle)
         expect(autocomplete.list.find('li').length).toBe 4
         expect(autocomplete.list.find('li:eq(0)')).toHaveText 'pivot'
@@ -416,7 +416,7 @@ describe "AutocompleteView", ->
         expect(autocomplete.list.find('li:eq(3)')).toHaveText 'quicksort'
         expect(editor.lineForBufferRow(10)).toEqual 'pivot'
 
-        miniEditor.textInput('o')
+        miniEditor.getModel().insertText('o')
         window.advanceClock(autocomplete.inputThrottle)
         expect(autocomplete.list.find('li').length).toBe 2
         expect(autocomplete.list.find('li:eq(0)')).toHaveText 'pivot'
@@ -428,11 +428,11 @@ describe "AutocompleteView", ->
         editor.setCursorBufferPosition([10,0])
         autocomplete.attach()
 
-        miniEditor.textInput('iv')
+        miniEditor.getModel().insertText('iv')
         window.advanceClock(autocomplete.inputThrottle)
         expect(autocomplete.list.find('li:eq(0)')).toHaveText 'pivot'
 
-        miniEditor.textInput(' ')
+        miniEditor.getModel().insertText(' ')
         window.advanceClock(autocomplete.inputThrottle)
         expect(autocomplete.parent()).not.toExist()
         expect(editor.lineForBufferRow(10)).toEqual 'pivot '
@@ -530,7 +530,7 @@ describe "AutocompleteView", ->
         cssEditorView = new EditorView({editor})
 
     runs ->
-      cssEditor = cssEditorView.editor
+      cssEditor = cssEditorView.getModel()
       autocomplete = new AutocompleteView(cssEditorView)
 
       cssEditorView.attachToDom()

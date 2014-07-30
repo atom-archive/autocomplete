@@ -37,12 +37,11 @@ class AutocompleteView extends SelectListView
     @subscribeToCommand @editorView, 'autocomplete:next', => @selectNextItemView()
     @subscribeToCommand @editorView, 'autocomplete:previous', => @selectPreviousItemView()
 
-    @filterEditorView.preempt 'textInput', ({originalEvent}) =>
-      text = originalEvent.data
+    @filterEditorView.getModel().on 'will-insert-text', ({preventDefault, text}) =>
       unless text.match(@wordRegex)
         @confirmSelection()
         @editor.insertText(text)
-        false
+        preventDefault()
 
   setCurrentBuffer: (@currentBuffer) ->
 
@@ -91,7 +90,6 @@ class AutocompleteView extends SelectListView
 
   cancelled: ->
     super
-
     @editor.abortTransaction()
     @editor.setSelectedBufferRanges(@originalSelectionBufferRanges)
     @editorView.focus()
