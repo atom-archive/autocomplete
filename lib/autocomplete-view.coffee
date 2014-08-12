@@ -37,11 +37,11 @@ class AutocompleteView extends SelectListView
     @subscribeToCommand @editorView, 'autocomplete:next', => @selectNextItemView()
     @subscribeToCommand @editorView, 'autocomplete:previous', => @selectPreviousItemView()
 
-    @filterEditorView.getModel().on 'will-insert-text', ({preventDefault, text}) =>
+    @filterEditorView.getModel().on 'will-insert-text', ({cancel, text}) =>
       unless text.match(@wordRegex)
         @confirmSelection()
         @editor.insertText(text)
-        preventDefault()
+        cancel()
 
   setCurrentBuffer: (@currentBuffer) ->
 
