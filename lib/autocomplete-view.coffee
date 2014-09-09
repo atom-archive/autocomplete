@@ -90,9 +90,10 @@ class AutocompleteView extends SelectListView
 
   cancelled: ->
     super
-    @editor.abortTransaction()
-    @editor.setSelectedBufferRanges(@originalSelectionBufferRanges)
-    @editorView.focus()
+    unless @editor.isDestroyed()
+      @editor.abortTransaction()
+      @editor.setSelectedBufferRanges(@originalSelectionBufferRanges)
+      @editorView.focus()
 
   attach: ->
     @editor.beginTransaction()
