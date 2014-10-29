@@ -93,7 +93,7 @@ class AutocompleteView extends SelectListView
     unless @editor.isDestroyed()
       @editor.abortTransaction()
       @editor.setSelectedBufferRanges(@originalSelectionBufferRanges)
-      @editorView.focus()
+      @editorView[0].focus() unless document.activeElement is @editorView[0]
 
   attach: ->
     @editor.beginTransaction()
