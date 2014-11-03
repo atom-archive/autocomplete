@@ -203,3 +203,13 @@ class AutocompleteView extends SelectListView
     super
 
     @setPosition()
+
+  ###
+   * Clean up, stop listening to events
+   * @public
+  ###
+  dispose: ->
+    # @currentBuffer?.off "changed", @onChanged
+    # @currentBuffer?.off "saved", @onSaved
+    # @editor.off "title-changed-subscription-removed", @cancel
+    # @editor.off "cursor-moved", @cursorMoved
