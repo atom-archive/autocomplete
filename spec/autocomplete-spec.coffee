@@ -296,6 +296,19 @@ describe "AutocompleteView", ->
       expect(editor.getSelection().getBufferRange()).toEqual originalSelectionBufferRange
       expect(editorView.find('.autocomplete')).not.toExist()
 
+    it 'commits previous transactions before attaching', ->
+      lines = editor.getBuffer().getLineCount()
+      editor.setSelectedBufferRange [[0, 0], [0, 0]]
+      editor.beginTransaction()
+      editor.insertNewlineBelow()
+      editor.getLastCursor().skipLeadingWhitespace()
+      expect(editor.lineForBufferRow(1)).toBe ''
+      expect(editor.getBuffer().getLineCount()).toBe lines + 1
+      editor.getBuffer().insert [1, 0], 'quick'
+      editor.setSelectedBufferRange [[1, 4], [1, 5]]
+      autocomplete.attach()
+      expect(editor.lineForBufferRow(1)).toBe 'quicksort'
+
     it "does not clear out a previously confirmed selection when canceling with an empty list", ->
       editor.getBuffer().insert([10, 0], "ort\n")
       editor.setCursorBufferPosition([10, 0])
