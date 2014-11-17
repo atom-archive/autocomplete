@@ -96,6 +96,7 @@ class AutocompleteView extends SelectListView
       @editorView[0].focus() unless document.activeElement is @editorView[0]
 
   attach: ->
+    @editor.commitTransaction() if @editor.getBuffer().history.isTransacting()
     @editor.beginTransaction()
 
     @aboveCursor = false
