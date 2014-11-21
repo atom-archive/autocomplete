@@ -146,6 +146,15 @@ describe "AutocompleteView", ->
         expect(editor.getCursorBufferPosition()).toEqual [10,10]
         expect(editor.getSelection().isEmpty()).toBeTruthy()
 
+      it "allows the completion to be undone as a single operation", ->
+        editor.getBuffer().insert([10,0] ,"extra:s:extra")
+        editor.setCursorBufferPosition([10,7])
+        autocomplete.attach()
+
+        editor.undo()
+
+        expect(editor.lineForBufferRow(10)).toBe "extra:s:extra"
+
       describe "when `autocomplete.includeCompletionsFromAllBuffers` is true", ->
         it "shows words from all open buffers", ->
           atom.config.set('autocomplete.includeCompletionsFromAllBuffers', true)

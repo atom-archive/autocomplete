@@ -4,6 +4,7 @@ _ = require 'underscore-plus'
 module.exports =
 class AutocompleteView extends SelectListView
   currentBuffer: null
+  checkpoint: null
   wordList: null
   wordRegex: /\w+/g
   originalSelectionBufferRanges: null
@@ -80,10 +81,9 @@ class AutocompleteView extends SelectListView
 
   confirmed: (match) ->
     @editor.getSelections().forEach (selection) -> selection.clear()
-
     @cancel()
     return unless match
-    @replaceSelectedTextWithMatch match
+    @replaceSelectedTextWithMatch(match)
     @editor.getCursors().forEach (cursor) ->
       position = cursor.getBufferPosition()
       cursor.setBufferPosition([position.row, position.column + match.suffix.length])
@@ -91,12 +91,13 @@ class AutocompleteView extends SelectListView
   cancelled: ->
     super
     unless @editor.isDestroyed()
-      @editor.abortTransaction()
+      @editor.revertToCheckpoint(@checkpoint)
+
       @editor.setSelectedBufferRanges(@originalSelectionBufferRanges)
       @editorView[0].focus() unless document.activeElement is @editorView[0]
 
   attach: ->
-    @editor.beginTransaction()
+    @checkpoint = @editor.createCheckpoint()
 
     @aboveCursor = false
     @originalSelectionBufferRanges = @editor.getSelections().map (selection) -> selection.getBufferRange()
@@ -145,23 +146,23 @@ class AutocompleteView extends SelectListView
 
   replaceSelectedTextWithMatch: (match) ->
     newSelectedBufferRanges = []
-    selections = @editor.getSelections()
+    @editor.transact =>
+      selections = @editor.getSelections()
+      selections.forEach (selection, i) =>
+        startPosition = selection.getBufferRange().start
+        buffer = @editor.getBuffer()
 
-    selections.forEach (selection, i) =>
-      startPosition = selection.getBufferRange().start
-      buffer = @editor.getBuffer()
+        selection.deleteSelectedText()
+        cursorPosition = @editor.getCursors()[i].getBufferPosition()
+        buffer.delete(Range.fromPointWithDelta(cursorPosition, 0, match.suffix.length))
+        buffer.delete(Range.fromPointWithDelta(cursorPosition, 0, -match.prefix.length))
 
-      selection.deleteSelectedText()
-      cursorPosition = @editor.getCursors()[i].getBufferPosition()
-      buffer.delete(Range.fromPointWithDelta(cursorPosition, 0, match.suffix.length))
-      buffer.delete(Range.fromPointWithDelta(cursorPosition, 0, -match.prefix.length))
+        infixLength = match.word.length - match.prefix.length - match.suffix.length
 
-      infixLength = match.word.length - match.prefix.length - match.suffix.length
+        newSelectedBufferRanges.push([startPosition, [startPosition.row, startPosition.column + infixLength]])
 
-      newSelectedBufferRanges.push([startPosition, [startPosition.row, startPosition.column + infixLength]])
-
-    @editor.insertText(match.word)
-    @editor.setSelectedBufferRanges(newSelectedBufferRanges)
+      @editor.insertText(match.word)
+      @editor.setSelectedBufferRanges(newSelectedBufferRanges)
 
   prefixAndSuffixOfSelection: (selection) ->
     selectionRange = selection.getBufferRange()
