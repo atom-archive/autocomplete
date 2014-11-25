@@ -1,4 +1,5 @@
-{$, EditorView, WorkspaceView} = require 'atom'
+{EditorView, WorkspaceView} = require 'atom'
+{$} = require 'atom-space-pen-views'
 AutocompleteView = require '../lib/autocomplete-view'
 Autocomplete = require '../lib/autocomplete'
 
@@ -24,7 +25,7 @@ describe "Autocomplete", ->
       leftEditor = atom.workspaceView.getActiveView()
       rightEditor = leftEditor.splitRight()
 
-      leftEditor.trigger 'autocomplete:toggle'
+      atom.commands.dispatch leftEditor.element, 'autocomplete:toggle'
 
       waitsForPromise ->
         activationPromise
@@ -35,15 +36,15 @@ describe "Autocomplete", ->
         expect(AutocompleteView.prototype.initialize).toHaveBeenCalled()
 
         autoCompleteView = leftEditor.find('.autocomplete').view()
-        autoCompleteView.trigger 'core:cancel'
+        atom.commands.dispatch leftEditor.find('.autocomplete').element, 'core:cancel'
         expect(leftEditor.find('.autocomplete')).not.toExist()
 
-        rightEditor.trigger 'autocomplete:toggle'
+        atom.commands.dispatch rightEditor.element, 'autocomplete:toggle'
         expect(rightEditor.find('.autocomplete')).toExist()
 
   describe "@deactivate()", ->
     it "removes all autocomplete views and doesn't create new ones when new editors are opened", ->
-      atom.workspaceView.getActiveView().trigger "autocomplete:toggle"
+      atom.commands.dispatch atom.workspaceView.getActiveView().element, "autocomplete:toggle"
 
       waitsForPromise ->
         activationPromise
@@ -53,7 +54,7 @@ describe "Autocomplete", ->
         atom.packages.deactivatePackage('autocomplete')
         expect(atom.workspaceView.getActiveView().find('.autocomplete')).not.toExist()
         atom.workspaceView.getActiveView().splitRight()
-        atom.workspaceView.getActiveView().trigger "autocomplete:toggle"
+        atom.commands.dispatch atom.workspaceView.getActiveView().element, "autocomplete:toggle"
         expect(atom.workspaceView.getActiveView().find('.autocomplete')).not.toExist()
 
 describe "AutocompleteView", ->
@@ -76,17 +77,17 @@ describe "AutocompleteView", ->
       editorView.attachToDom()
       expect(editorView.find('.autocomplete')).not.toExist()
 
-      editorView.trigger "autocomplete:toggle"
+      atom.commands.dispatch editorView.element, "autocomplete:toggle"
       expect(editorView.find('.autocomplete')).toExist()
       expect(autocomplete.editor.isFocused).toBeFalsy()
-      expect(autocomplete.filterEditorView.isFocused).toBeTruthy()
+      expect(autocomplete.filterEditorView.hasFocus()).toBeTruthy()
 
     describe "when the editor is empty", ->
       it "displays no matches", ->
         editor.setText('')
         expect(editorView.find('.autocomplete')).not.toExist()
 
-        editorView.trigger "autocomplete:toggle"
+        atom.commands.dispatch editorView.element, "autocomplete:toggle"
         expect(editor.getText()).toBe ''
         expect(editorView.find('.autocomplete')).toExist()
         expect(autocomplete.list.find('li').length).toBe 0
@@ -285,7 +286,7 @@ describe "AutocompleteView", ->
         autocomplete.attach()
         expect(autocomplete.error).toHaveText "No matches found"
 
-        miniEditor.trigger "core:cancel"
+        atom.commands.dispatch miniEditor.element, "core:cancel"
 
         expect(editor.lineForBufferRow(10)).toBe "xxx"
         expect(editor.getCursorBufferPosition()).toEqual [10,3]
@@ -299,7 +300,7 @@ describe "AutocompleteView", ->
 
       autocomplete.attach()
       editor.setCursorBufferPosition [0, 0] # even if selection changes before cancel, it should work
-      miniEditor.trigger "core:cancel"
+      atom.commands.dispatch miniEditor.element, "core:cancel"
 
       expect(editor.lineForBufferRow(10)).toBe "extra:so:extra"
       expect(editor.getSelection().getBufferRange()).toEqual originalSelectionBufferRange
@@ -310,12 +311,12 @@ describe "AutocompleteView", ->
       editor.setCursorBufferPosition([10, 0])
 
       autocomplete.attach()
-      miniEditor.trigger 'core:confirm'
+      atom.commands.dispatch miniEditor.element, "core:confirm"
       expect(editor.lineForBufferRow(10)).toBe 'quicksort'
 
       editor.setCursorBufferPosition([11, 0])
       autocomplete.attach()
-      miniEditor.trigger 'core:cancel'
+      atom.commands.dispatch miniEditor.element, "core:cancel"
       expect(editor.lineForBufferRow(10)).toBe 'quicksort'
 
     it "restores the case of the prefix to the original value", ->
@@ -325,7 +326,9 @@ describe "AutocompleteView", ->
 
       expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
       expect(editor.getCursorBufferPosition()).toEqual [10,11]
-      autocomplete.trigger 'core:cancel'
+      atom.commands.dispatch miniEditor.element, "core:cancel"
+
+      atom.commands.dispatch autocomplete.element, 'core:cancel'
       expect(editor.lineForBufferRow(10)).toBe "extra:S:extra"
       expect(editor.getCursorBufferPosition()).toEqual [10,7]
 
@@ -336,7 +339,7 @@ describe "AutocompleteView", ->
 
       editor.getBuffer().append('hi')
       expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
-      autocomplete.trigger 'core:cancel'
+      atom.commands.dispatch autocomplete.element, 'core:cancel'
       expect(editor.lineForBufferRow(10)).toBe "extra:s:extra"
 
       editor.redo()
@@ -348,13 +351,13 @@ describe "AutocompleteView", ->
       editor.setCursorBufferPosition([10,6])
       autocomplete.attach()
 
-      miniEditor.trigger "core:move-up"
+      atom.commands.dispatch miniEditor.element, "core:move-up"
       expect(editor.lineForBufferRow(10)).toBe "extra:sort:extra"
       expect(autocomplete.find('li:eq(0)')).not.toHaveClass('selected')
       expect(autocomplete.find('li:eq(1)')).not.toHaveClass('selected')
       expect(autocomplete.find('li:eq(7)')).toHaveClass('selected')
 
-      miniEditor.trigger "core:move-up"
+      atom.commands.dispatch miniEditor.element, "core:move-up"
       expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
       expect(autocomplete.find('li:eq(0)')).not.toHaveClass('selected')
       expect(autocomplete.find('li:eq(7)')).not.toHaveClass('selected')
@@ -366,12 +369,12 @@ describe "AutocompleteView", ->
       editor.setCursorBufferPosition([10,7])
       autocomplete.attach()
 
-      miniEditor.trigger "core:move-down"
+      atom.commands.dispatch miniEditor.element, "core:move-down"
       expect(editor.lineForBufferRow(10)).toBe "extra:sort:extra"
       expect(autocomplete.find('li:eq(0)')).not.toHaveClass('selected')
       expect(autocomplete.find('li:eq(1)')).toHaveClass('selected')
 
-      miniEditor.trigger "core:move-down"
+      atom.commands.dispatch miniEditor.element, "core:move-down"
       expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
       expect(autocomplete.find('li:eq(0)')).toHaveClass('selected')
       expect(autocomplete.find('li:eq(1)')).not.toHaveClass('selected')
@@ -469,8 +472,8 @@ describe "AutocompleteView", ->
         autocomplete.attach()
         expect(editorView.find('.autocomplete')).toExist()
 
-        expect(autocomplete.position().top).toBe cursorPixelPosition.top + editorView.lineHeight
-        expect(autocomplete.position().left).toBe cursorPixelPosition.left
+        expect(autocomplete.element.offsetTop).toBe cursorPixelPosition.top + editorView.lineHeight
+        expect(autocomplete.element.offsetLeft).toBe cursorPixelPosition.left
 
     describe "when the autocomplete view does not fit below the cursor", ->
       it "adds the autocomplete view to the editor above the cursor", ->
@@ -481,9 +484,9 @@ describe "AutocompleteView", ->
         autocomplete.attach()
 
         expect(autocomplete.parent()).toExist()
-        autocompleteBottom = autocomplete.position().top + autocomplete.outerHeight()
+        autocompleteBottom = autocomplete.element.offsetTop + autocomplete.outerHeight()
         expect(autocompleteBottom).toBe cursorPixelPosition.top
-        expect(autocomplete.position().left).toBe cursorPixelPosition.left
+        expect(autocomplete.element.offsetLeft).toBe cursorPixelPosition.left
 
       it "updates the position when the list is filtered and the height of the list decreases", ->
         editor.setCursorScreenPosition([11, 0])
@@ -493,17 +496,19 @@ describe "AutocompleteView", ->
         autocomplete.attach()
 
         expect(autocomplete.parent()).toExist()
-        autocompleteBottom = autocomplete.position().top + autocomplete.outerHeight()
+        autocompleteBottom = autocomplete.element.offsetTop + autocomplete.outerHeight()
         expect(autocompleteBottom).toBe cursorPixelPosition.top
-        expect(autocomplete.position().left).toBe cursorPixelPosition.left
+        expect(autocomplete.element.offsetLeft).toBe cursorPixelPosition.left
 
-        miniEditor.textInput('sh')
+        event = document.createEvent('TextEvent')
+        event.initTextEvent('textInput', true, true, window, 'sh')
+        miniEditor.element.dispatchEvent(event)
         window.advanceClock(autocomplete.inputThrottle)
 
         expect(autocomplete.parent()).toExist()
-        autocompleteBottom = autocomplete.position().top + autocomplete.outerHeight()
+        autocompleteBottom = autocomplete.element.offsetTop + autocomplete.outerHeight()
         expect(autocompleteBottom).toBe cursorPixelPosition.top
-        expect(autocomplete.position().left).toBe cursorPixelPosition.left
+        expect(autocomplete.element.offsetLeft).toBe cursorPixelPosition.left
 
   describe ".cancel()", ->
     it "clears the mini-editor and unbinds autocomplete event handlers for move-up and move-down", ->
@@ -513,10 +518,10 @@ describe "AutocompleteView", ->
       autocomplete.cancel()
       expect(miniEditor.getText()).toBe ''
 
-      editorView.trigger 'core:move-down'
+      atom.commands.dispatch editorView.element, 'core:move-down'
       expect(editor.getCursorBufferPosition().row).toBe 1
 
-      editorView.trigger 'core:move-up'
+      atom.commands.dispatch editorView.element, 'core:move-up'
       expect(editor.getCursorBufferPosition().row).toBe 0
 
   it "sets the width of the view to be wide enough to contain the longest completion without scrolling", ->

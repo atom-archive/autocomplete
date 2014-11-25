@@ -1,5 +1,6 @@
 _ = require 'underscore-plus'
-{$, $$, Range, SelectListView}  = require 'atom'
+{Range, CompositeDisposable}  = require 'atom'
+{$, $$, SelectListView}  = require 'atom-space-pen-views'
 
 module.exports =
 class AutocompleteView extends SelectListView
@@ -30,13 +31,17 @@ class AutocompleteView extends SelectListView
     @list.on 'mousewheel', (event) -> event.stopPropagation()
 
     @editorView.on 'editor:path-changed', => @setCurrentBuffer(@editor.getBuffer())
-    @subscribeToCommand @editorView, 'autocomplete:toggle', =>
-      if @hasParent()
-        @cancel()
-      else
-        @attach()
-    @subscribeToCommand @editorView, 'autocomplete:next', => @selectNextItemView()
-    @subscribeToCommand @editorView, 'autocomplete:previous', => @selectPreviousItemView()
+
+    @subscriptions = new CompositeDisposable
+    @subscriptions.add @editor.onDidDestroy => @subscriptions.dispose()
+    @subscriptions.add atom.commands.add @editorView.element,
+      'autocomplete:toggle': =>
+        if @hasParent()
+          @cancel()
+        else
+          @attach()
+      'autocomplete:next': => @selectNextItemView()
+      'autocomplete:previous': => @selectPreviousItemView()
 
     @filterEditorView.getModel().on 'will-insert-text', ({cancel, text}) =>
       unless text.match(@wordRegex)
@@ -89,7 +94,7 @@ class AutocompleteView extends SelectListView
       cursor.setBufferPosition([position.row, position.column + match.suffix.length])
 
   cancelled: ->
-    super
+    @detach()
     unless @editor.isDestroyed()
       @editor.revertToCheckpoint(@checkpoint)
 
@@ -192,13 +197,14 @@ class AutocompleteView extends SelectListView
       return true unless previousPrefix? and previousSuffix?
       prefix is previousPrefix and suffix is previousSuffix
 
-  afterAttach: (onDom) ->
-    if onDom
-      widestCompletion = parseInt(@css('min-width')) or 0
-      @list.find('span').each ->
-        widestCompletion = Math.max(widestCompletion, $(this).outerWidth())
-      @list.width(widestCompletion)
-      @width(@list.outerWidth())
+  attached: ->
+    widestCompletion = parseInt(@css('min-width')) or 0
+    @list.find('span').each ->
+      widestCompletion = Math.max(widestCompletion, $(this).outerWidth())
+    @list.width(widestCompletion)
+    @width(@list.outerWidth())
+
+  detached: ->
 
   populateList: ->
     super
