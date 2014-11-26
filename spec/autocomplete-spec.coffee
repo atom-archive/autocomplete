@@ -457,7 +457,7 @@ describe "AutocompleteView", ->
 
   it "sets the width of the view to be wide enough to contain the longest completion without scrolling", ->
     editor.insertText('thisIsAReallyReallyReallyLongCompletion ')
-    editor.moveCursorToBottom()
+    editor.moveToBottom()
     editor.insertNewline()
     editor.insertText('t')
     autocomplete.attach()
@@ -476,9 +476,9 @@ describe "AutocompleteView", ->
     runs ->
       autocomplete = new AutocompleteView(cssEditor)
 
-      cssEditor.moveCursorToEndOfLine()
+      cssEditor.moveToEndOfLine()
       cssEditor.insertText(' out')
-      cssEditor.moveCursorToEndOfLine()
+      cssEditor.moveToEndOfLine()
 
       autocomplete.attach()
       expect(autocomplete.list.find('li').length).toBe 5
