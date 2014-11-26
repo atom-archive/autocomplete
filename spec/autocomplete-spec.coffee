@@ -1,19 +1,17 @@
-{WorkspaceView} = require 'atom'
 {$} = require 'atom-space-pen-views'
 AutocompleteView = require '../lib/autocomplete-view'
 Autocomplete = require '../lib/autocomplete'
 
 describe "Autocomplete", ->
-  [activationPromise] = []
+  [workspaceElement, activationPromise] = []
 
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
-
     waitsForPromise ->
       atom.workspace.open('sample.js')
 
     runs ->
-      atom.workspaceView.simulateDomAttachment()
+      workspaceElement = atom.views.getView(atom.workspace)
+      jasmine.attachToDOM(workspaceElement)
       activationPromise = atom.packages.activatePackage('autocomplete')
 
   describe "@activate()", ->
@@ -21,50 +19,47 @@ describe "Autocomplete", ->
       spyOn(AutocompleteView.prototype, 'initialize').andCallThrough()
 
       expect(AutocompleteView.prototype.initialize).not.toHaveBeenCalled()
+      atom.workspace.getActivePane().splitRight(copyActiveItem: true)
 
-      atom.workspaceView.attachToDom()
-      leftEditor = atom.workspaceView.getActiveView()
-      rightEditor = leftEditor.splitRight()
+      [leftEditorElement, rightEditorElement] = workspaceElement.querySelectorAll('atom-text-editor')
 
-      atom.commands.dispatch leftEditor.element, 'autocomplete:toggle'
+      atom.commands.dispatch leftEditorElement, 'autocomplete:toggle'
 
       waitsForPromise ->
         activationPromise
 
       runs ->
-        expect(leftEditor.find('.autocomplete')).toExist()
-        expect(rightEditor.find('.autocomplete')).not.toExist()
+        expect(leftEditorElement.querySelector('.autocomplete')).toExist()
+        expect(rightEditorElement.querySelector('.autocomplete')).not.toExist()
         expect(AutocompleteView.prototype.initialize).toHaveBeenCalled()
 
-        autoCompleteView = leftEditor.find('.autocomplete').view()
-        atom.commands.dispatch leftEditor.find('.autocomplete').element, 'core:cancel'
-        expect(leftEditor.find('.autocomplete')).not.toExist()
+        atom.commands.dispatch leftEditorElement.querySelector('.autocomplete'), 'core:cancel'
+        expect(leftEditorElement.querySelector('.autocomplete')).not.toExist()
 
-        atom.commands.dispatch rightEditor.element, 'autocomplete:toggle'
-        expect(rightEditor.find('.autocomplete')).toExist()
+        atom.commands.dispatch rightEditorElement, 'autocomplete:toggle'
+        expect(rightEditorElement.querySelector('.autocomplete')).toExist()
 
   describe "@deactivate()", ->
     it "removes all autocomplete views and doesn't create new ones when new editors are opened", ->
-      atom.workspaceView.attachToDom()
-      atom.commands.dispatch atom.workspaceView.getActiveView().element, "autocomplete:toggle"
+      textEditorElement = workspaceElement.querySelector('atom-text-editor')
+      atom.commands.dispatch textEditorElement, "autocomplete:toggle"
 
       waitsForPromise ->
         activationPromise
 
       runs ->
-        expect(atom.workspaceView.getActiveView().find('.autocomplete')).toExist()
+        expect(textEditorElement.querySelector('.autocomplete')).toExist()
         atom.packages.deactivatePackage('autocomplete')
-        expect(atom.workspaceView.getActiveView().find('.autocomplete')).not.toExist()
-        atom.workspaceView.getActiveView().splitRight()
-        atom.commands.dispatch atom.workspaceView.getActiveView().element, "autocomplete:toggle"
-        expect(atom.workspaceView.getActiveView().find('.autocomplete')).not.toExist()
+        expect(textEditorElement.querySelector('.autocomplete')).not.toExist()
+
+        atom.workspace.getActivePane().splitRight(copyActiveItem: true)
+        atom.commands.dispatch atom.views.getView(atom.workspace.getActivePaneItem()), "autocomplete:toggle"
+        expect(workspaceElement.querySelector('.autocomplete')).not.toExist()
 
 describe "AutocompleteView", ->
   [autocomplete, editor, miniEditor] = []
 
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
-
     waitsForPromise ->
       atom.workspace.open('sample.js').then (anEditor) -> editor = anEditor
 
