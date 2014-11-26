@@ -153,7 +153,7 @@ class AutocompleteView extends SelectListView
 
   prefixAndSuffixOfSelection: (selection) ->
     selectionRange = selection.getBufferRange()
-    lineRange = [[selectionRange.start.row, 0], [selectionRange.end.row, @editor.lineLengthForBufferRow(selectionRange.end.row)]]
+    lineRange = [[selectionRange.start.row, 0], [selectionRange.end.row, @editor.lineTextForBufferRow(selectionRange.end.row).length]]
     [prefix, suffix] = ["", ""]
 
     @currentBuffer.scanInRange @wordRegex, lineRange, ({match, range, stop}) ->
