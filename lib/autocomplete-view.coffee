@@ -94,7 +94,7 @@ class AutocompleteView extends SelectListView
       cursor.setBufferPosition([position.row, position.column + match.suffix.length])
 
   cancelled: ->
-    @overlayMarker?.destroy()
+    @overlayDecoration?.destroy()
 
     unless @editor.isDestroyed()
       @editor.revertToCheckpoint(@checkpoint)
@@ -118,8 +118,8 @@ class AutocompleteView extends SelectListView
     if matches.length is 1
       @confirmSelection()
     else
-      @overlayMarker = @editor.markScreenRange([@originalCursorPosition, @originalCursorPosition], reversed: true, invalidate: 'never')
-      @editor.decorateMarker(@overlayMarker, type: 'overlay', item: this)
+      cursorMarker = @editor.getLastCursor().getMarker()
+      @overlayDecoration = @editor.decorateMarker(cursorMarker, type: 'overlay', position: 'tail', item: this)
 
   findMatchesForCurrentSelection: ->
     selection = @editor.getSelection()
