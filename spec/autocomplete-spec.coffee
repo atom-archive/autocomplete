@@ -100,7 +100,7 @@ describe "AutocompleteView", ->
         editor.setCursorBufferPosition([10,7])
         autocomplete.attach()
 
-        expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
+        expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,11]
         expect(editor.getLastSelection().getBufferRange()).toEqual [[10,7], [10,11]]
 
@@ -113,7 +113,7 @@ describe "AutocompleteView", ->
         editor.setCursorBufferPosition([10,6])
         autocomplete.attach()
 
-        expect(editor.lineForBufferRow(10)).toBe "extra:function:extra"
+        expect(editor.lineTextForBufferRow(10)).toBe "extra:function:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,13]
         expect(editor.getLastSelection().getBufferRange()).toEqual [[10,6], [10,13]]
 
@@ -126,7 +126,7 @@ describe "AutocompleteView", ->
         editor.setCursorBufferPosition([8,44])
         autocomplete.attach()
 
-        expect(editor.lineForBufferRow(8)).toBe "    return sort(left).concat(pivot).concat(quicksort(right));"
+        expect(editor.lineTextForBufferRow(8)).toBe "    return sort(left).concat(pivot).concat(quicksort(right));"
         expect(editor.getCursorBufferPosition()).toEqual [8,52]
         expect(editor.getLastSelection().getBufferRange().isEmpty()).toBeTruthy()
 
@@ -145,7 +145,7 @@ describe "AutocompleteView", ->
         editor.setCursorBufferPosition([10,8])
         autocomplete.attach()
 
-        expect(editor.lineForBufferRow(10)).toBe "extra:sort:extra"
+        expect(editor.lineTextForBufferRow(10)).toBe "extra:sort:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,10]
         expect(editor.getLastSelection().isEmpty()).toBeTruthy()
 
@@ -156,7 +156,7 @@ describe "AutocompleteView", ->
 
         editor.undo()
 
-        expect(editor.lineForBufferRow(10)).toBe "extra:s:extra"
+        expect(editor.lineTextForBufferRow(10)).toBe "extra:s:extra"
 
       describe "when `autocomplete.includeCompletionsFromAllBuffers` is true", ->
         it "shows words from all open buffers", ->
@@ -180,7 +180,7 @@ describe "AutocompleteView", ->
           editor.setSelectedBufferRanges([[[10,1],[10,1]], [[10,9],[10,9]]])
           autocomplete.attach()
 
-          expect(editor.lineForBufferRow(10)).toBe "shift:extra:shift"
+          expect(editor.lineTextForBufferRow(10)).toBe "shift:extra:shift"
           expect(editor.getCursorBufferPosition()).toEqual [10,12]
           expect(editor.getLastSelection().getBufferRange()).toEqual [[10,8], [10,12]]
 
@@ -196,7 +196,7 @@ describe "AutocompleteView", ->
             editor.setSelectedBufferRanges([[[10,1],[10,1]], [[10,9],[10,9]]])
             autocomplete.attach()
 
-            expect(editor.lineForBufferRow(10)).toBe "s:extra:a"
+            expect(editor.lineTextForBufferRow(10)).toBe "s:extra:a"
             expect(editor.getSelections().length).toEqual(2)
             expect(editor.getSelections()[0].getBufferRange()).toEqual [[10,1], [10,1]]
             expect(editor.getSelections()[1].getBufferRange()).toEqual [[10,9], [10,9]]
@@ -209,7 +209,7 @@ describe "AutocompleteView", ->
         editor.setSelectedBufferRange [[10,7], [10,10]]
         autocomplete.attach()
 
-        expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
+        expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,11]
         expect(editor.getLastSelection().getBufferRange().isEmpty()).toBeTruthy()
 
@@ -220,7 +220,7 @@ describe "AutocompleteView", ->
         editor.setSelectedBufferRange [[10,6],[10,12]]
         autocomplete.attach()
 
-        expect(editor.lineForBufferRow(10)).toBe "extra:concat:extra"
+        expect(editor.lineTextForBufferRow(10)).toBe "extra:concat:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,11]
         expect(editor.getLastSelection().getBufferRange()).toEqual [[10,6],[10,11]]
 
@@ -231,7 +231,7 @@ describe "AutocompleteView", ->
         editor.setSelectedBufferRange [[5,7],[5,12]]
         autocomplete.attach()
 
-        expect(editor.lineForBufferRow(5)).toBe "      concat = items.shift();"
+        expect(editor.lineTextForBufferRow(5)).toBe "      concat = items.shift();"
         expect(editor.getCursorBufferPosition()).toEqual [5,12]
         expect(editor.getLastSelection().getBufferRange().isEmpty()).toBeTruthy()
 
@@ -242,7 +242,7 @@ describe "AutocompleteView", ->
         editor.setSelectedBufferRange [[10,7], [10,9]]
         autocomplete.attach()
 
-        expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
+        expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,11]
         expect(editor.getLastSelection().isEmpty()).toBeTruthy()
 
@@ -254,7 +254,7 @@ describe "AutocompleteView", ->
           editor.setSelectedBufferRanges [[[10,1], [10,3]], [[10,12], [10,14]]]
           autocomplete.attach()
 
-          expect(editor.lineForBufferRow(10)).toBe "shift:extra:shift"
+          expect(editor.lineTextForBufferRow(10)).toBe "shift:extra:shift"
           expect(editor.getSelections().length).toEqual(2)
           expect(editor.getOverlayDecorations().length).toBe 0
 
@@ -266,7 +266,7 @@ describe "AutocompleteView", ->
           editor.setCursorBufferPosition([10,8])
           autocomplete.attach()
 
-          expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
+          expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
           expect(editor.getCursorBufferPosition()).toEqual [10,11]
           expect(editor.getLastSelection().isEmpty()).toBeTruthy()
           expect(editor.getOverlayDecorations().length).toBe 0
@@ -282,7 +282,7 @@ describe "AutocompleteView", ->
 
         atom.commands.dispatch miniEditor.element, "core:cancel"
 
-        expect(editor.lineForBufferRow(10)).toBe "xxx"
+        expect(editor.lineTextForBufferRow(10)).toBe "xxx"
         expect(editor.getCursorBufferPosition()).toEqual [10,3]
         expect(editor.getLastSelection().isEmpty()).toBeTruthy()
         expect(editor.getOverlayDecorations().length).toBe 0
@@ -297,7 +297,7 @@ describe "AutocompleteView", ->
       editor.setCursorBufferPosition [0, 0] # even if selection changes before cancel, it should work
       atom.commands.dispatch miniEditor.element, "core:cancel"
 
-      expect(editor.lineForBufferRow(10)).toBe "extra:so:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:so:extra"
       expect(editor.getLastSelection().getBufferRange()).toEqual originalSelectionBufferRange
       expect(editor.getOverlayDecorations().length).toBe 0
 
@@ -307,24 +307,24 @@ describe "AutocompleteView", ->
 
       autocomplete.attach()
       atom.commands.dispatch miniEditor.element, "core:confirm"
-      expect(editor.lineForBufferRow(10)).toBe 'quicksort'
+      expect(editor.lineTextForBufferRow(10)).toBe 'quicksort'
 
       editor.setCursorBufferPosition([11, 0])
       autocomplete.attach()
       atom.commands.dispatch miniEditor.element, "core:cancel"
-      expect(editor.lineForBufferRow(10)).toBe 'quicksort'
+      expect(editor.lineTextForBufferRow(10)).toBe 'quicksort'
 
     it "restores the case of the prefix to the original value", ->
       editor.getBuffer().insert([10,0] ,"extra:S:extra")
       editor.setCursorBufferPosition([10,7])
       autocomplete.attach()
 
-      expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
       expect(editor.getCursorBufferPosition()).toEqual [10,11]
       atom.commands.dispatch miniEditor.element, "core:cancel"
 
       atom.commands.dispatch autocomplete.element, 'core:cancel'
-      expect(editor.lineForBufferRow(10)).toBe "extra:S:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:S:extra"
       expect(editor.getCursorBufferPosition()).toEqual [10,7]
 
     it "restores the original buffer contents even if there was an additional operation after autocomplete attached (regression)", ->
@@ -333,12 +333,12 @@ describe "AutocompleteView", ->
       autocomplete.attach()
 
       editor.getBuffer().append('hi')
-      expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
       atom.commands.dispatch autocomplete.element, 'core:cancel'
-      expect(editor.lineForBufferRow(10)).toBe "extra:s:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:s:extra"
 
       editor.redo()
-      expect(editor.lineForBufferRow(10)).toBe "extra:s:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:s:extra"
 
   describe 'move-up event', ->
     it "highlights the previous match and replaces the selection with it", ->
@@ -347,13 +347,13 @@ describe "AutocompleteView", ->
       autocomplete.attach()
 
       atom.commands.dispatch miniEditor.element, "core:move-up"
-      expect(editor.lineForBufferRow(10)).toBe "extra:sort:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:sort:extra"
       expect(autocomplete.find('li:eq(0)')).not.toHaveClass('selected')
       expect(autocomplete.find('li:eq(1)')).not.toHaveClass('selected')
       expect(autocomplete.find('li:eq(7)')).toHaveClass('selected')
 
       atom.commands.dispatch miniEditor.element, "core:move-up"
-      expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
       expect(autocomplete.find('li:eq(0)')).not.toHaveClass('selected')
       expect(autocomplete.find('li:eq(7)')).not.toHaveClass('selected')
       expect(autocomplete.find('li:eq(6)')).toHaveClass('selected')
@@ -365,12 +365,12 @@ describe "AutocompleteView", ->
       autocomplete.attach()
 
       atom.commands.dispatch miniEditor.element, "core:move-down"
-      expect(editor.lineForBufferRow(10)).toBe "extra:sort:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:sort:extra"
       expect(autocomplete.find('li:eq(0)')).not.toHaveClass('selected')
       expect(autocomplete.find('li:eq(1)')).toHaveClass('selected')
 
       atom.commands.dispatch miniEditor.element, "core:move-down"
-      expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
+      expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
       expect(autocomplete.find('li:eq(0)')).toHaveClass('selected')
       expect(autocomplete.find('li:eq(1)')).not.toHaveClass('selected')
 
@@ -386,7 +386,7 @@ describe "AutocompleteView", ->
       matchToSelect.mouseup()
 
       expect(autocomplete.parent()).not.toExist()
-      expect(editor.lineForBufferRow(10)).toBe matchToSelect.text()
+      expect(editor.lineTextForBufferRow(10)).toBe matchToSelect.text()
 
   describe "when the mini-editor receives keyboard input", ->
     beforeEach ->
@@ -422,7 +422,7 @@ describe "AutocompleteView", ->
         expect(autocomplete.list.find('li:eq(1)')).toHaveText 'right'
         expect(autocomplete.list.find('li:eq(2)')).toHaveText 'shift'
         expect(autocomplete.list.find('li:eq(3)')).toHaveText 'quicksort'
-        expect(editor.lineForBufferRow(10)).toEqual 'pivot'
+        expect(editor.lineTextForBufferRow(10)).toEqual 'pivot'
 
         miniEditor.getModel().insertText('o')
         window.advanceClock(autocomplete.inputThrottle)
@@ -444,7 +444,7 @@ describe "AutocompleteView", ->
         miniEditor.getModel().insertText(' ')
         window.advanceClock(autocomplete.inputThrottle)
         expect(editor.getOverlayDecorations().length).toBe 0
-        expect(editor.lineForBufferRow(10)).toEqual 'pivot '
+        expect(editor.lineTextForBufferRow(10)).toEqual 'pivot '
 
   describe ".cancel()", ->
     it "removes the overlay and clears the mini editor", ->
