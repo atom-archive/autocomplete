@@ -102,7 +102,7 @@ describe "AutocompleteView", ->
 
         expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,11]
-        expect(editor.getSelection().getBufferRange()).toEqual [[10,7], [10,11]]
+        expect(editor.getLastSelection().getBufferRange()).toEqual [[10,7], [10,11]]
 
         expect(autocomplete.list.find('li').length).toBe 2
         expect(autocomplete.list.find('li:eq(0)')).toHaveText('shift')
@@ -115,7 +115,7 @@ describe "AutocompleteView", ->
 
         expect(editor.lineForBufferRow(10)).toBe "extra:function:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,13]
-        expect(editor.getSelection().getBufferRange()).toEqual [[10,6], [10,13]]
+        expect(editor.getLastSelection().getBufferRange()).toEqual [[10,6], [10,13]]
 
         expect(autocomplete.list.find('li').length).toBe 2
         expect(autocomplete.list.find('li:eq(0)')).toHaveText('function')
@@ -128,7 +128,7 @@ describe "AutocompleteView", ->
 
         expect(editor.lineForBufferRow(8)).toBe "    return sort(left).concat(pivot).concat(quicksort(right));"
         expect(editor.getCursorBufferPosition()).toEqual [8,52]
-        expect(editor.getSelection().getBufferRange().isEmpty()).toBeTruthy()
+        expect(editor.getLastSelection().getBufferRange().isEmpty()).toBeTruthy()
 
         expect(autocomplete.list.find('li').length).toBe 0
 
@@ -147,7 +147,7 @@ describe "AutocompleteView", ->
 
         expect(editor.lineForBufferRow(10)).toBe "extra:sort:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,10]
-        expect(editor.getSelection().isEmpty()).toBeTruthy()
+        expect(editor.getLastSelection().isEmpty()).toBeTruthy()
 
       it "allows the completion to be undone as a single operation", ->
         editor.getBuffer().insert([10,0] ,"extra:s:extra")
@@ -182,7 +182,7 @@ describe "AutocompleteView", ->
 
           expect(editor.lineForBufferRow(10)).toBe "shift:extra:shift"
           expect(editor.getCursorBufferPosition()).toEqual [10,12]
-          expect(editor.getSelection().getBufferRange()).toEqual [[10,8], [10,12]]
+          expect(editor.getLastSelection().getBufferRange()).toEqual [[10,8], [10,12]]
 
           expect(editor.getSelections().length).toEqual(2)
 
@@ -211,7 +211,7 @@ describe "AutocompleteView", ->
 
         expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,11]
-        expect(editor.getSelection().getBufferRange().isEmpty()).toBeTruthy()
+        expect(editor.getLastSelection().getBufferRange().isEmpty()).toBeTruthy()
 
         expect(autocomplete.list.find('li').length).toBe 0
 
@@ -222,7 +222,7 @@ describe "AutocompleteView", ->
 
         expect(editor.lineForBufferRow(10)).toBe "extra:concat:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,11]
-        expect(editor.getSelection().getBufferRange()).toEqual [[10,6],[10,11]]
+        expect(editor.getLastSelection().getBufferRange()).toEqual [[10,6],[10,11]]
 
         expect(autocomplete.list.find('li').length).toBe 7
         expect(autocomplete.list.find('li:contains(current)')).not.toExist()
@@ -233,7 +233,7 @@ describe "AutocompleteView", ->
 
         expect(editor.lineForBufferRow(5)).toBe "      concat = items.shift();"
         expect(editor.getCursorBufferPosition()).toEqual [5,12]
-        expect(editor.getSelection().getBufferRange().isEmpty()).toBeTruthy()
+        expect(editor.getLastSelection().getBufferRange().isEmpty()).toBeTruthy()
 
         expect(autocomplete.list.find('li').length).toBe 0
 
@@ -244,7 +244,7 @@ describe "AutocompleteView", ->
 
         expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
         expect(editor.getCursorBufferPosition()).toEqual [10,11]
-        expect(editor.getSelection().isEmpty()).toBeTruthy()
+        expect(editor.getLastSelection().isEmpty()).toBeTruthy()
 
         expect(editor.getOverlayDecorations().length).toBe 0
 
@@ -268,7 +268,7 @@ describe "AutocompleteView", ->
 
           expect(editor.lineForBufferRow(10)).toBe "extra:shift:extra"
           expect(editor.getCursorBufferPosition()).toEqual [10,11]
-          expect(editor.getSelection().isEmpty()).toBeTruthy()
+          expect(editor.getLastSelection().isEmpty()).toBeTruthy()
           expect(editor.getOverlayDecorations().length).toBe 0
 
   describe 'core:cancel event', ->
@@ -284,13 +284,13 @@ describe "AutocompleteView", ->
 
         expect(editor.lineForBufferRow(10)).toBe "xxx"
         expect(editor.getCursorBufferPosition()).toEqual [10,3]
-        expect(editor.getSelection().isEmpty()).toBeTruthy()
+        expect(editor.getLastSelection().isEmpty()).toBeTruthy()
         expect(editor.getOverlayDecorations().length).toBe 0
 
     it 'does not replace selection, removes autocomplete view and returns focus to editor', ->
       editor.getBuffer().insert([10,0] ,"extra:so:extra")
       editor.setSelectedBufferRange [[10,7], [10,8]]
-      originalSelectionBufferRange = editor.getSelection().getBufferRange()
+      originalSelectionBufferRange = editor.getLastSelection().getBufferRange()
 
       autocomplete.attach()
       expect(editor.getOverlayDecorations().length).toBe 1
@@ -298,7 +298,7 @@ describe "AutocompleteView", ->
       atom.commands.dispatch miniEditor.element, "core:cancel"
 
       expect(editor.lineForBufferRow(10)).toBe "extra:so:extra"
-      expect(editor.getSelection().getBufferRange()).toEqual originalSelectionBufferRange
+      expect(editor.getLastSelection().getBufferRange()).toEqual originalSelectionBufferRange
       expect(editor.getOverlayDecorations().length).toBe 0
 
     it "does not clear out a previously confirmed selection when canceling with an empty list", ->

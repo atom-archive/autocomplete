@@ -120,7 +120,7 @@ class AutocompleteView extends SelectListView
       @attach()
 
   findMatchesForCurrentSelection: ->
-    selection = @editor.getSelection()
+    selection = @editor.getLastSelection()
     {prefix, suffix} = @prefixAndSuffixOfSelection(selection)
 
     if (prefix.length + suffix.length) > 0
