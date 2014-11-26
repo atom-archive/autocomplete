@@ -12,10 +12,9 @@ class AutocompleteView extends SelectListView
   originalCursorPosition: null
   aboveCursor: false
 
-  initialize: (@editorView) ->
+  initialize: (@editor) ->
     super
     @addClass('autocomplete popover-list')
-    {@editor} = @editorView
     @handleEvents()
     @setCurrentBuffer(@editor.getBuffer())
 
@@ -30,18 +29,10 @@ class AutocompleteView extends SelectListView
   handleEvents: ->
     @list.on 'mousewheel', (event) -> event.stopPropagation()
 
-    @editorView.on 'editor:path-changed', => @setCurrentBuffer(@editor.getBuffer())
+    @editor.onDidChangePath => @setCurrentBuffer(@editor.getBuffer())
 
     @subscriptions = new CompositeDisposable
     @subscriptions.add @editor.onDidDestroy => @subscriptions.dispose()
-    @subscriptions.add atom.commands.add @editorView.element,
-      'autocomplete:toggle': =>
-        if @isVisible()
-          @cancel()
-        else
-          @attach()
-      'autocomplete:next': => @selectNextItemView()
-      'autocomplete:previous': => @selectPreviousItemView()
 
     @filterEditorView.getModel().on 'will-insert-text', ({cancel, text}) =>
       unless text.match(@wordRegex)
@@ -100,7 +91,8 @@ class AutocompleteView extends SelectListView
       @editor.revertToCheckpoint(@checkpoint)
 
       @editor.setSelectedBufferRanges(@originalSelectionBufferRanges)
-      @editorView[0].focus() unless document.activeElement is @editorView[0]
+
+      atom.workspace.getActivePane().activate()
 
   attach: ->
     @checkpoint = @editor.createCheckpoint()
@@ -120,6 +112,12 @@ class AutocompleteView extends SelectListView
     else
       cursorMarker = @editor.getLastCursor().getMarker()
       @overlayDecoration = @editor.decorateMarker(cursorMarker, type: 'overlay', position: 'tail', item: this)
+
+  toggle: ->
+    if @isVisible()
+      @cancel()
+    else
+      @attach()
 
   findMatchesForCurrentSelection: ->
     selection = @editor.getSelection()

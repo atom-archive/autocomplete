@@ -71,15 +71,15 @@ describe "AutocompleteView", ->
 
     runs ->
       {editor} = editorView
-      autocomplete = new AutocompleteView(editorView)
+      autocomplete = new AutocompleteView(editor)
       miniEditor = autocomplete.filterEditorView
 
-  describe 'autocomplete:toggle event', ->
+  describe '::attach', ->
     it "shows autocomplete view and focuses its mini-editor", ->
       editorView.attachToDom()
       expect(editorView.find('.autocomplete')).not.toExist()
 
-      atom.commands.dispatch editorView.element, "autocomplete:toggle"
+      autocomplete.attach()
       expect(editorView.find('.autocomplete')).toExist()
       expect(autocomplete.editor.isFocused).toBeFalsy()
       expect(autocomplete.filterEditorView.hasFocus()).toBeTruthy()
@@ -90,7 +90,7 @@ describe "AutocompleteView", ->
         editor.setText('')
         expect(editorView.find('.autocomplete')).not.toExist()
 
-        atom.commands.dispatch editorView.element, "autocomplete:toggle"
+        autocomplete.attach()
         expect(editor.getText()).toBe ''
         expect(editorView.find('.autocomplete')).toExist()
         expect(autocomplete.list.find('li').length).toBe 0
@@ -514,7 +514,7 @@ describe "AutocompleteView", ->
 
     runs ->
       cssEditor = cssEditorView.getModel()
-      autocomplete = new AutocompleteView(cssEditorView)
+      autocomplete = new AutocompleteView(cssEditor)
 
       cssEditorView.attachToDom()
       cssEditor.moveCursorToEndOfLine()

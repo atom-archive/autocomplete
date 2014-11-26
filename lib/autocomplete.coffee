@@ -1,3 +1,4 @@
+{CompositeDisposable, Disposable} = require 'atom'
 _ = require 'underscore-plus'
 AutocompleteView = require './autocomplete-view'
 
@@ -5,20 +6,33 @@ module.exports =
   configDefaults:
     includeCompletionsFromAllBuffers: false
 
-  autocompleteViews: []
-  editorSubscription: null
+  autocompleteViewsByEditor: null
+  deactivationDisposables: null
 
   activate: ->
-    @editorSubscription = atom.workspaceView.eachEditorView (editor) =>
-      if editor.attached and not editor.mini
-        autocompleteView = new AutocompleteView(editor)
-        editor.on 'editor:will-be-removed', =>
-          autocompleteView.remove() unless autocompleteView.hasParent()
-          _.remove(@autocompleteViews, autocompleteView)
-        @autocompleteViews.push(autocompleteView)
+    @autocompleteViewsByEditor = new WeakMap
+    @deactivationDisposables = new CompositeDisposable
+
+    @deactivationDisposables.add atom.workspace.observeTextEditors (editor) =>
+      return if editor.mini
+
+      autocompleteView = new AutocompleteView(editor)
+      @autocompleteViewsByEditor.set(editor, autocompleteView)
+
+      disposable = new Disposable => autocompleteView.remove()
+      @deactivationDisposables.add editor.onDidDestroy => disposable.dispose()
+      @deactivationDisposables.add disposable
+
+    getAutocompleteView = (editorElement) =>
+      @autocompleteViewsByEditor.get(editorElement.getModel())
+
+    @deactivationDisposables.add atom.commands.add 'atom-text-editor:not([mini])',
+      'autocomplete:toggle': ->
+        getAutocompleteView(this)?.toggle()
+      'autocomplete:next': =>
+        getAutocompleteView(this)?.selectNextItemView()
+      'autocomplete:previous': =>
+        getAutocompleteView(this)?.selectPreviousItemView()
 
   deactivate: ->
-    @editorSubscription?.off()
-    @editorSubscription = null
-    @autocompleteViews.forEach (autocompleteView) -> autocompleteView.remove()
-    @autocompleteViews = []
+    @deactivationDisposables.dispose()
