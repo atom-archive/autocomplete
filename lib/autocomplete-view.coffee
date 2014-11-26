@@ -36,7 +36,7 @@ class AutocompleteView extends SelectListView
     @subscriptions.add @editor.onDidDestroy => @subscriptions.dispose()
     @subscriptions.add atom.commands.add @editorView.element,
       'autocomplete:toggle': =>
-        if @hasParent()
+        if @isVisible()
           @cancel()
         else
           @attach()
@@ -94,7 +94,8 @@ class AutocompleteView extends SelectListView
       cursor.setBufferPosition([position.row, position.column + match.suffix.length])
 
   cancelled: ->
-    @detach()
+    @overlayMarker?.destroy()
+
     unless @editor.isDestroyed()
       @editor.revertToCheckpoint(@checkpoint)
 
@@ -117,25 +118,8 @@ class AutocompleteView extends SelectListView
     if matches.length is 1
       @confirmSelection()
     else
-      @editorView.appendToLinesView(this)
-      @setPosition()
-      @focusFilterEditor()
-
-  setPosition: ->
-    {left, top} = @editorView.pixelPositionForScreenPosition(@originalCursorPosition)
-    height = @outerHeight()
-    width = @outerWidth()
-    potentialTop = top + @editorView.lineHeight
-    potentialBottom = potentialTop - @editorView.scrollTop() + height
-    parentWidth = @parent().width()
-
-    left = parentWidth - width if left + width > parentWidth
-
-    if @aboveCursor or potentialBottom > @editorView.outerHeight()
-      @aboveCursor = true
-      @css(left: left, top: top - height, bottom: 'inherit')
-    else
-      @css(left: left, top: potentialTop, bottom: 'inherit')
+      @overlayMarker = @editor.markScreenRange([@originalCursorPosition, @originalCursorPosition], reversed: true, invalidate: 'never')
+      @editor.decorateMarker(@overlayMarker, type: 'overlay', item: this)
 
   findMatchesForCurrentSelection: ->
     selection = @editor.getSelection()
@@ -198,6 +182,8 @@ class AutocompleteView extends SelectListView
       prefix is previousPrefix and suffix is previousSuffix
 
   attached: ->
+    @focusFilterEditor()
+
     widestCompletion = parseInt(@css('min-width')) or 0
     @list.find('span').each ->
       widestCompletion = Math.max(widestCompletion, $(this).outerWidth())
@@ -208,5 +194,3 @@ class AutocompleteView extends SelectListView
 
   populateList: ->
     super
-
-    @setPosition()

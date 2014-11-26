@@ -22,6 +22,7 @@ describe "Autocomplete", ->
 
       expect(AutocompleteView.prototype.initialize).not.toHaveBeenCalled()
 
+      atom.workspaceView.attachToDom()
       leftEditor = atom.workspaceView.getActiveView()
       rightEditor = leftEditor.splitRight()
 
@@ -44,6 +45,7 @@ describe "Autocomplete", ->
 
   describe "@deactivate()", ->
     it "removes all autocomplete views and doesn't create new ones when new editors are opened", ->
+      atom.workspaceView.attachToDom()
       atom.commands.dispatch atom.workspaceView.getActiveView().element, "autocomplete:toggle"
 
       waitsForPromise ->
@@ -84,6 +86,7 @@ describe "AutocompleteView", ->
 
     describe "when the editor is empty", ->
       it "displays no matches", ->
+        editorView.attachToDom()
         editor.setText('')
         expect(editorView.find('.autocomplete')).not.toExist()
 
@@ -446,7 +449,7 @@ describe "AutocompleteView", ->
 
         miniEditor.getModel().insertText(' ')
         window.advanceClock(autocomplete.inputThrottle)
-        expect(autocomplete.parent()).not.toExist()
+        expect(autocomplete.isVisible()).toBe false
         expect(editor.lineForBufferRow(10)).toEqual 'pivot '
 
   describe 'when the mini-editor loses focus before the selection is confirmed', ->
@@ -472,8 +475,9 @@ describe "AutocompleteView", ->
         autocomplete.attach()
         expect(editorView.find('.autocomplete')).toExist()
 
-        expect(autocomplete.element.offsetTop).toBe cursorPixelPosition.top + editorView.lineHeight
-        expect(autocomplete.element.offsetLeft).toBe cursorPixelPosition.left
+        overlayElement = autocomplete.element.parentElement
+        expect(overlayElement.offsetTop).toBe cursorPixelPosition.top + editorView.lineHeight
+        expect(overlayElement.offsetLeft).toBe cursorPixelPosition.left
 
     describe "when the autocomplete view does not fit below the cursor", ->
       it "adds the autocomplete view to the editor above the cursor", ->
