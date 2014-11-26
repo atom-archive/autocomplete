@@ -34,7 +34,7 @@ class AutocompleteView extends SelectListView
     @subscriptions = new CompositeDisposable
     @subscriptions.add @editor.onDidDestroy => @subscriptions.dispose()
 
-    @filterEditorView.getModel().on 'will-insert-text', ({cancel, text}) =>
+    @filterEditorView.getModel().onWillInsertText ({cancel, text}) =>
       unless text.match(@wordRegex)
         @confirmSelection()
         @editor.insertText(text)
