@@ -3,8 +3,10 @@ _ = require 'underscore-plus'
 AutocompleteView = require './autocomplete-view'
 
 module.exports =
-  configDefaults:
-    includeCompletionsFromAllBuffers: false
+  config:
+    includeCompletionsFromAllBuffers:
+      type: 'boolean'
+      default: false
 
   autocompleteViewsByEditor: null
   deactivationDisposables: null
