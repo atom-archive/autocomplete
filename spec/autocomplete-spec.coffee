@@ -479,41 +479,6 @@ describe "AutocompleteView", ->
         expect(overlayElement.offsetTop).toBe cursorPixelPosition.top + editorView.lineHeight
         expect(overlayElement.offsetLeft).toBe cursorPixelPosition.left
 
-    describe "when the autocomplete view does not fit below the cursor", ->
-      it "adds the autocomplete view to the editor above the cursor", ->
-        editor.setCursorScreenPosition([11, 0])
-        editor.insertText('t ')
-        editor.setCursorScreenPosition([11, 0])
-        cursorPixelPosition = editorView.pixelPositionForScreenPosition(editor.getCursorScreenPosition())
-        autocomplete.attach()
-
-        expect(autocomplete.parent()).toExist()
-        autocompleteBottom = autocomplete.element.offsetTop + autocomplete.outerHeight()
-        expect(autocompleteBottom).toBe cursorPixelPosition.top
-        expect(autocomplete.element.offsetLeft).toBe cursorPixelPosition.left
-
-      it "updates the position when the list is filtered and the height of the list decreases", ->
-        editor.setCursorScreenPosition([11, 0])
-        editor.insertText('s')
-        editor.setCursorScreenPosition([11, 0])
-        cursorPixelPosition = editorView.pixelPositionForScreenPosition(editor.getCursorScreenPosition())
-        autocomplete.attach()
-
-        expect(autocomplete.parent()).toExist()
-        autocompleteBottom = autocomplete.element.offsetTop + autocomplete.outerHeight()
-        expect(autocompleteBottom).toBe cursorPixelPosition.top
-        expect(autocomplete.element.offsetLeft).toBe cursorPixelPosition.left
-
-        event = document.createEvent('TextEvent')
-        event.initTextEvent('textInput', true, true, window, 'sh')
-        miniEditor.element.dispatchEvent(event)
-        window.advanceClock(autocomplete.inputThrottle)
-
-        expect(autocomplete.parent()).toExist()
-        autocompleteBottom = autocomplete.element.offsetTop + autocomplete.outerHeight()
-        expect(autocompleteBottom).toBe cursorPixelPosition.top
-        expect(autocomplete.element.offsetLeft).toBe cursorPixelPosition.left
-
   describe ".cancel()", ->
     it "clears the mini-editor and unbinds autocomplete event handlers for move-up and move-down", ->
       autocomplete.attach()
