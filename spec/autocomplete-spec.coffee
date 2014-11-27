@@ -28,15 +28,24 @@ describe "Autocomplete", ->
       waitsForPromise ->
         activationPromise
 
+      waitsForAnimationFrame()
+
       runs ->
         expect(leftEditorElement.querySelector('.autocomplete')).toExist()
         expect(rightEditorElement.querySelector('.autocomplete')).not.toExist()
         expect(AutocompleteView.prototype.initialize).toHaveBeenCalled()
 
         atom.commands.dispatch leftEditorElement.querySelector('.autocomplete'), 'core:cancel'
-        expect(leftEditorElement.querySelector('.autocomplete')).not.toExist()
 
+      waitsForAnimationFrame()
+
+      runs ->
+        expect(leftEditorElement.querySelector('.autocomplete')).not.toExist()
         atom.commands.dispatch rightEditorElement, 'autocomplete:toggle'
+
+      waitsForAnimationFrame()
+
+      runs ->
         expect(rightEditorElement.querySelector('.autocomplete')).toExist()
 
   describe "@deactivate()", ->
@@ -47,14 +56,48 @@ describe "Autocomplete", ->
       waitsForPromise ->
         activationPromise
 
+      waitsForAnimationFrame()
       runs ->
         expect(textEditorElement.querySelector('.autocomplete')).toExist()
         atom.packages.deactivatePackage('autocomplete')
+
+      waitsForAnimationFrame()
+      runs ->
         expect(textEditorElement.querySelector('.autocomplete')).not.toExist()
 
         atom.workspace.getActivePane().splitRight(copyActiveItem: true)
         atom.commands.dispatch atom.views.getView(atom.workspace.getActivePaneItem()), "autocomplete:toggle"
+
+      waitsForAnimationFrame()
+      runs ->
         expect(workspaceElement.querySelector('.autocomplete')).not.toExist()
+
+  describe "confirming an auto-completion", ->
+    it "updates the buffer with the selected completion and restores focus", ->
+      editor = null
+
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editorElement = atom.views.getView(editor)
+        editorElement.setUpdatedSynchronously(false)
+
+        editor.getBuffer().insert([10,0] ,"extra:s:extra")
+        editor.setCursorBufferPosition([10,7])
+
+        atom.commands.dispatch document.activeElement, 'autocomplete:toggle'
+
+      waitsForPromise -> activationPromise
+      waitsForAnimationFrame()
+
+      runs ->
+        expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
+
+        atom.commands.dispatch document.activeElement, 'core:confirm'
+
+      waitsForAnimationFrame()
+
+      runs ->
+        expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
 
 describe "AutocompleteView", ->
   [autocomplete, editor, miniEditor] = []
