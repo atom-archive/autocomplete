@@ -3,14 +3,15 @@
   "version": "0.33.1",
   "main": "./lib/autocomplete",
   "description": "Display possible completions in the editor with `ctrl-space`.",
-  "activationEvents": {
-    "autocomplete:toggle": ".editor"
+  "activationCommands": {
+    "atom-text-editor": ["autocomplete:toggle"]
   },
   "repository": "https://github.com/atom/autocomplete",
   "engines": {
     "atom": "*"
   },
   "dependencies": {
+    "atom-space-pen-views": "^0.20.0",
     "underscore-plus": "1.x"
   }
 }
