@@ -28,7 +28,7 @@ describe "Autocomplete", ->
       waitsForPromise ->
         activationPromise
 
-      waitsForAnimationFrame()
+      waits()
 
       runs ->
         expect(leftEditorElement.querySelector('.autocomplete')).toExist()
@@ -37,13 +37,13 @@ describe "Autocomplete", ->
 
         atom.commands.dispatch leftEditorElement.querySelector('.autocomplete'), 'core:cancel'
 
-      waitsForAnimationFrame()
+      waits()
 
       runs ->
         expect(leftEditorElement.querySelector('.autocomplete')).not.toExist()
         atom.commands.dispatch rightEditorElement, 'autocomplete:toggle'
 
-      waitsForAnimationFrame()
+      waits()
 
       runs ->
         expect(rightEditorElement.querySelector('.autocomplete')).toExist()
@@ -56,19 +56,19 @@ describe "Autocomplete", ->
       waitsForPromise ->
         activationPromise
 
-      waitsForAnimationFrame()
+      waits()
       runs ->
         expect(textEditorElement.querySelector('.autocomplete')).toExist()
         atom.packages.deactivatePackage('autocomplete')
 
-      waitsForAnimationFrame()
+      waits()
       runs ->
         expect(textEditorElement.querySelector('.autocomplete')).not.toExist()
 
         atom.workspace.getActivePane().splitRight(copyActiveItem: true)
         atom.commands.dispatch atom.views.getView(atom.workspace.getActivePaneItem()), "autocomplete:toggle"
 
-      waitsForAnimationFrame()
+      waits()
       runs ->
         expect(workspaceElement.querySelector('.autocomplete')).not.toExist()
 
@@ -87,14 +87,14 @@ describe "Autocomplete", ->
         atom.commands.dispatch document.activeElement, 'autocomplete:toggle'
 
       waitsForPromise -> activationPromise
-      waitsForAnimationFrame()
+      waits()
 
       runs ->
         expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
 
         atom.commands.dispatch document.activeElement, 'core:confirm'
 
-      waitsForAnimationFrame()
+      waits()
 
       runs ->
         expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
