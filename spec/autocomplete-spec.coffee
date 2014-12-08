@@ -505,7 +505,7 @@ describe "AutocompleteView", ->
     editor.insertText('t')
     autocomplete.attach()
     jasmine.attachToDOM(autocomplete.element)
-    expect(autocomplete.list.prop('scrollWidth')).toBe autocomplete.list.width()
+    expect(autocomplete.list.prop('scrollWidth')).toBeLessThan autocomplete.list.width() + 1
 
   it "includes completions for the scope's completion preferences", ->
     cssEditor = null
