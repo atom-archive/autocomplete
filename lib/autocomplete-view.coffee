@@ -57,7 +57,7 @@ class AutocompleteView extends SelectListView
 
   getCompletionsForCursorScope: ->
     cursorScope = @editor.scopeDescriptorForBufferPosition(@editor.getCursorBufferPosition())
-    completions = atom.config.get(cursorScope, 'editor.completions')
+    completions = atom.config.get('editor.completions', scope: cursorScope)
     _.uniq(_.flatten(completions))
 
   buildWordList: ->
