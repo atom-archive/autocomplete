@@ -112,6 +112,9 @@ class AutocompleteView extends SelectListView
       cursorMarker = @editor.getLastCursor().getMarker()
       @overlayDecoration = @editor.decorateMarker(cursorMarker, type: 'overlay', position: 'tail', item: this)
 
+  destroy: ->
+    @overlayDecoration?.destroy()
+
   toggle: ->
     if @isVisible()
       @cancel()
