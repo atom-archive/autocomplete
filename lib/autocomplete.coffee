@@ -31,9 +31,9 @@ module.exports =
     @deactivationDisposables.add atom.commands.add 'atom-text-editor:not([mini])',
       'autocomplete:toggle': ->
         getAutocompleteView(this)?.toggle()
-      'autocomplete:next': =>
+      'autocomplete:next': ->
         getAutocompleteView(this)?.selectNextItemView()
-      'autocomplete:previous': =>
+      'autocomplete:previous': ->
         getAutocompleteView(this)?.selectPreviousItemView()
 
   deactivate: ->
