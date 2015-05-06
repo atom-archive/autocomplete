@@ -506,27 +506,3 @@ describe "AutocompleteView", ->
     autocomplete.attach()
     jasmine.attachToDOM(autocomplete.element)
     expect(autocomplete.list.prop('scrollWidth')).toBeLessThan autocomplete.list.width() + 1
-
-  it "includes completions for the scope's completion preferences", ->
-    cssEditor = null
-
-    waitsForPromise ->
-      atom.packages.activatePackage('language-css')
-
-    waitsForPromise ->
-      atom.workspace.open('css.css').then (editor) -> cssEditor = editor
-
-    runs ->
-      autocomplete = new AutocompleteView(cssEditor)
-
-      cssEditor.moveToEndOfLine()
-      cssEditor.insertText(' out')
-      cssEditor.moveToEndOfLine()
-
-      autocomplete.attach()
-      expect(autocomplete.list.find('li').length).toBe 5
-      expect(autocomplete.list.find('li:eq(0)')).toHaveText 'outline'
-      expect(autocomplete.list.find('li:eq(1)')).toHaveText 'outline-color'
-      expect(autocomplete.list.find('li:eq(2)')).toHaveText 'outline-offset'
-      expect(autocomplete.list.find('li:eq(3)')).toHaveText 'outline-style'
-      expect(autocomplete.list.find('li:eq(4)')).toHaveText 'outline-width'
