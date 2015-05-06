@@ -517,7 +517,6 @@ describe "AutocompleteView", ->
       atom.workspace.open('css.css').then (editor) -> cssEditor = editor
 
     runs ->
-      atom.config.set('editor.completions', ["outrigger"], scopeSelector: '.source')
       autocomplete = new AutocompleteView(cssEditor)
 
       cssEditor.moveToEndOfLine()
@@ -525,10 +524,9 @@ describe "AutocompleteView", ->
       cssEditor.moveToEndOfLine()
 
       autocomplete.attach()
-      expect(autocomplete.list.find('li').length).toBe 6
+      expect(autocomplete.list.find('li').length).toBe 5
       expect(autocomplete.list.find('li:eq(0)')).toHaveText 'outline'
       expect(autocomplete.list.find('li:eq(1)')).toHaveText 'outline-color'
       expect(autocomplete.list.find('li:eq(2)')).toHaveText 'outline-offset'
       expect(autocomplete.list.find('li:eq(3)')).toHaveText 'outline-style'
       expect(autocomplete.list.find('li:eq(4)')).toHaveText 'outline-width'
-      expect(autocomplete.list.find('li:eq(5)')).toHaveText 'outrigger'
