@@ -9,6 +9,7 @@
     ]
   },
   "repository": "https://github.com/atom/autocomplete",
+  "license": "MIT",
   "engines": {
     "atom": "*"
   },
