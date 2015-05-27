@@ -81,8 +81,8 @@ describe "Autocomplete", ->
         editorElement = atom.views.getView(editor)
         editorElement.setUpdatedSynchronously(false)
 
-        editor.getBuffer().insert([10,0] ,"extra:s:extra")
-        editor.setCursorBufferPosition([10,7])
+        editor.getBuffer().insert([10, 0], "extra:s:extra")
+        editor.setCursorBufferPosition([10, 7])
 
         atom.commands.dispatch document.activeElement, 'autocomplete:toggle'
 
@@ -139,38 +139,38 @@ describe "AutocompleteView", ->
 
     describe "when no text is selected", ->
       it 'autocompletes word when there is only a prefix', ->
-        editor.getBuffer().insert([10,0] ,"extra:s:extra")
-        editor.setCursorBufferPosition([10,7])
+        editor.getBuffer().insert([10, 0], "extra:s:extra")
+        editor.setCursorBufferPosition([10, 7])
         autocomplete.attach()
 
         expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
-        expect(editor.getCursorBufferPosition()).toEqual [10,11]
-        expect(editor.getLastSelection().getBufferRange()).toEqual [[10,7], [10,11]]
+        expect(editor.getCursorBufferPosition()).toEqual [10, 11]
+        expect(editor.getLastSelection().getBufferRange()).toEqual [[10, 7], [10, 11]]
 
         expect(autocomplete.list.find('li').length).toBe 2
         expect(autocomplete.list.find('li:eq(0)')).toHaveText('shift')
         expect(autocomplete.list.find('li:eq(1)')).toHaveText('sort')
 
       it 'autocompletes word when there is only a suffix', ->
-        editor.getBuffer().insert([10,0] ,"extra:n:extra")
-        editor.setCursorBufferPosition([10,6])
+        editor.getBuffer().insert([10, 0], "extra:n:extra")
+        editor.setCursorBufferPosition([10, 6])
         autocomplete.attach()
 
         expect(editor.lineTextForBufferRow(10)).toBe "extra:function:extra"
-        expect(editor.getCursorBufferPosition()).toEqual [10,13]
-        expect(editor.getLastSelection().getBufferRange()).toEqual [[10,6], [10,13]]
+        expect(editor.getCursorBufferPosition()).toEqual [10, 13]
+        expect(editor.getLastSelection().getBufferRange()).toEqual [[10, 6], [10, 13]]
 
         expect(autocomplete.list.find('li').length).toBe 2
         expect(autocomplete.list.find('li:eq(0)')).toHaveText('function')
         expect(autocomplete.list.find('li:eq(1)')).toHaveText('return')
 
       it 'autocompletes word when there is a single prefix and suffix match', ->
-        editor.getBuffer().insert([8,43] ,"q")
-        editor.setCursorBufferPosition([8,44])
+        editor.getBuffer().insert([8, 43], "q")
+        editor.setCursorBufferPosition([8, 44])
         autocomplete.attach()
 
         expect(editor.lineTextForBufferRow(8)).toBe "    return sort(left).concat(pivot).concat(quicksort(right));"
-        expect(editor.getCursorBufferPosition()).toEqual [8,52]
+        expect(editor.getCursorBufferPosition()).toEqual [8, 52]
         expect(editor.getLastSelection().getBufferRange().isEmpty()).toBeTruthy()
 
         expect(autocomplete.list.find('li').length).toBe 0
@@ -184,17 +184,17 @@ describe "AutocompleteView", ->
         expect(autocomplete.list.find('li').length).toBe 22
 
       it "autocompletes word and replaces case of prefix with case of word", ->
-        editor.getBuffer().insert([10,0] ,"extra:SO:extra")
-        editor.setCursorBufferPosition([10,8])
+        editor.getBuffer().insert([10, 0], "extra:SO:extra")
+        editor.setCursorBufferPosition([10, 8])
         autocomplete.attach()
 
         expect(editor.lineTextForBufferRow(10)).toBe "extra:sort:extra"
-        expect(editor.getCursorBufferPosition()).toEqual [10,10]
+        expect(editor.getCursorBufferPosition()).toEqual [10, 10]
         expect(editor.getLastSelection().isEmpty()).toBeTruthy()
 
       it "allows the completion to be undone as a single operation", ->
-        editor.getBuffer().insert([10,0] ,"extra:s:extra")
-        editor.setCursorBufferPosition([10,7])
+        editor.getBuffer().insert([10, 0], "extra:s:extra")
+        editor.setCursorBufferPosition([10, 7])
         autocomplete.attach()
 
         editor.undo()
@@ -209,8 +209,8 @@ describe "AutocompleteView", ->
             atom.workspace.open('sample.txt')
 
           runs ->
-            editor.getBuffer().insert([10,0] ,"extra:SO:extra")
-            editor.setCursorBufferPosition([10,8])
+            editor.getBuffer().insert([10, 0], "extra:SO:extra")
+            editor.setCursorBufferPosition([10, 8])
             autocomplete.attach()
 
             expect(autocomplete.list.find('li').length).toBe 2
@@ -219,13 +219,13 @@ describe "AutocompleteView", ->
 
       describe 'where many cursors are defined', ->
         it 'autocompletes word when there is only a prefix', ->
-          editor.getBuffer().insert([10,0] ,"s:extra:s")
-          editor.setSelectedBufferRanges([[[10,1],[10,1]], [[10,9],[10,9]]])
+          editor.getBuffer().insert([10, 0], "s:extra:s")
+          editor.setSelectedBufferRanges([[[10, 1], [10, 1]], [[10, 9], [10, 9]]])
           autocomplete.attach()
 
           expect(editor.lineTextForBufferRow(10)).toBe "shift:extra:shift"
-          expect(editor.getCursorBufferPosition()).toEqual [10,12]
-          expect(editor.getLastSelection().getBufferRange()).toEqual [[10,8], [10,12]]
+          expect(editor.getCursorBufferPosition()).toEqual [10, 12]
+          expect(editor.getLastSelection().getBufferRange()).toEqual [[10, 8], [10, 12]]
 
           expect(editor.getSelections().length).toEqual(2)
 
@@ -235,66 +235,66 @@ describe "AutocompleteView", ->
 
         describe 'where text differs between cursors', ->
           it 'does not display the autocomplete overlay', ->
-            editor.getBuffer().insert([10,0] ,"s:extra:a")
-            editor.setSelectedBufferRanges([[[10,1],[10,1]], [[10,9],[10,9]]])
+            editor.getBuffer().insert([10, 0], "s:extra:a")
+            editor.setSelectedBufferRanges([[[10, 1], [10, 1]], [[10, 9], [10, 9]]])
             autocomplete.attach()
 
             expect(editor.lineTextForBufferRow(10)).toBe "s:extra:a"
             expect(editor.getSelections().length).toEqual(2)
-            expect(editor.getSelections()[0].getBufferRange()).toEqual [[10,1], [10,1]]
-            expect(editor.getSelections()[1].getBufferRange()).toEqual [[10,9], [10,9]]
+            expect(editor.getSelections()[0].getBufferRange()).toEqual [[10, 1], [10, 1]]
+            expect(editor.getSelections()[1].getBufferRange()).toEqual [[10, 9], [10, 9]]
 
             expect(editor.getOverlayDecorations().length).toBe 0
 
     describe "when text is selected", ->
       it 'autocompletes word when there is only a prefix', ->
-        editor.getBuffer().insert([10,0] ,"extra:sort:extra")
-        editor.setSelectedBufferRange [[10,7], [10,10]]
+        editor.getBuffer().insert([10, 0], "extra:sort:extra")
+        editor.setSelectedBufferRange [[10, 7], [10, 10]]
         autocomplete.attach()
 
         expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
-        expect(editor.getCursorBufferPosition()).toEqual [10,11]
+        expect(editor.getCursorBufferPosition()).toEqual [10, 11]
         expect(editor.getLastSelection().getBufferRange().isEmpty()).toBeTruthy()
 
         expect(autocomplete.list.find('li').length).toBe 0
 
       it 'autocompletes word when there is only a suffix', ->
-        editor.getBuffer().insert([10,0] ,"extra:current:extra")
-        editor.setSelectedBufferRange [[10,6],[10,12]]
+        editor.getBuffer().insert([10, 0], "extra:current:extra")
+        editor.setSelectedBufferRange [[10, 6], [10, 12]]
         autocomplete.attach()
 
         expect(editor.lineTextForBufferRow(10)).toBe "extra:concat:extra"
-        expect(editor.getCursorBufferPosition()).toEqual [10,11]
-        expect(editor.getLastSelection().getBufferRange()).toEqual [[10,6],[10,11]]
+        expect(editor.getCursorBufferPosition()).toEqual [10, 11]
+        expect(editor.getLastSelection().getBufferRange()).toEqual [[10, 6], [10, 11]]
 
         expect(autocomplete.list.find('li').length).toBe 7
         expect(autocomplete.list.find('li:contains(current)')).not.toExist()
 
       it 'autocompletes word when there is a prefix and suffix', ->
-        editor.setSelectedBufferRange [[5,7],[5,12]]
+        editor.setSelectedBufferRange [[5, 7], [5, 12]]
         autocomplete.attach()
 
         expect(editor.lineTextForBufferRow(5)).toBe "      concat = items.shift();"
-        expect(editor.getCursorBufferPosition()).toEqual [5,12]
+        expect(editor.getCursorBufferPosition()).toEqual [5, 12]
         expect(editor.getLastSelection().getBufferRange().isEmpty()).toBeTruthy()
 
         expect(autocomplete.list.find('li').length).toBe 0
 
       it 'replaces selection with selected match, moves the cursor to the end of the match, and removes the autocomplete overlay', ->
-        editor.getBuffer().insert([10,0] ,"extra:sort:extra")
-        editor.setSelectedBufferRange [[10,7], [10,9]]
+        editor.getBuffer().insert([10, 0], "extra:sort:extra")
+        editor.setSelectedBufferRange [[10, 7], [10, 9]]
         autocomplete.attach()
 
         expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
-        expect(editor.getCursorBufferPosition()).toEqual [10,11]
+        expect(editor.getCursorBufferPosition()).toEqual [10, 11]
         expect(editor.getLastSelection().isEmpty()).toBeTruthy()
 
         expect(editor.getOverlayDecorations().length).toBe 0
 
       describe "when many ranges are selected", ->
         it 'replaces selection with selected match, moves the cursor to the end of the match, and removes the autocomplete overlay', ->
-          editor.getBuffer().insert([10,0] ,"sort:extra:sort")
-          editor.setSelectedBufferRanges [[[10,1], [10,3]], [[10,12], [10,14]]]
+          editor.getBuffer().insert([10, 0], "sort:extra:sort")
+          editor.setSelectedBufferRanges [[[10, 1], [10, 3]], [[10, 12], [10, 14]]]
           autocomplete.attach()
 
           expect(editor.lineTextForBufferRow(10)).toBe "shift:extra:shift"
@@ -305,19 +305,19 @@ describe "AutocompleteView", ->
     describe "where there are matches", ->
       describe "where there is no selection", ->
         it "closes the menu and moves the cursor to the end", ->
-          editor.getBuffer().insert([10,0] ,"extra:sh:extra")
-          editor.setCursorBufferPosition([10,8])
+          editor.getBuffer().insert([10, 0], "extra:sh:extra")
+          editor.setCursorBufferPosition([10, 8])
           autocomplete.attach()
 
           expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
-          expect(editor.getCursorBufferPosition()).toEqual [10,11]
+          expect(editor.getCursorBufferPosition()).toEqual [10, 11]
           expect(editor.getLastSelection().isEmpty()).toBeTruthy()
           expect(editor.getOverlayDecorations().length).toBe 0
 
   describe 'core:cancel event', ->
     describe "when there are no matches", ->
       it "closes the menu without changing the buffer", ->
-        editor.getBuffer().insert([10,0] ,"xxx")
+        editor.getBuffer().insert([10, 0], "xxx")
         editor.setCursorBufferPosition [10, 3]
         autocomplete.attach()
         expect(editor.getOverlayDecorations().length).toBe 1
@@ -326,13 +326,13 @@ describe "AutocompleteView", ->
         atom.commands.dispatch miniEditor.element, "core:cancel"
 
         expect(editor.lineTextForBufferRow(10)).toBe "xxx"
-        expect(editor.getCursorBufferPosition()).toEqual [10,3]
+        expect(editor.getCursorBufferPosition()).toEqual [10, 3]
         expect(editor.getLastSelection().isEmpty()).toBeTruthy()
         expect(editor.getOverlayDecorations().length).toBe 0
 
     it 'does not replace selection, removes autocomplete view and returns focus to editor', ->
-      editor.getBuffer().insert([10,0] ,"extra:so:extra")
-      editor.setSelectedBufferRange [[10,7], [10,8]]
+      editor.getBuffer().insert([10, 0], "extra:so:extra")
+      editor.setSelectedBufferRange [[10, 7], [10, 8]]
       originalSelectionBufferRange = editor.getLastSelection().getBufferRange()
 
       autocomplete.attach()
@@ -358,21 +358,21 @@ describe "AutocompleteView", ->
       expect(editor.lineTextForBufferRow(10)).toBe 'quicksort'
 
     it "restores the case of the prefix to the original value", ->
-      editor.getBuffer().insert([10,0] ,"extra:S:extra")
-      editor.setCursorBufferPosition([10,7])
+      editor.getBuffer().insert([10, 0], "extra:S:extra")
+      editor.setCursorBufferPosition([10, 7])
       autocomplete.attach()
 
       expect(editor.lineTextForBufferRow(10)).toBe "extra:shift:extra"
-      expect(editor.getCursorBufferPosition()).toEqual [10,11]
+      expect(editor.getCursorBufferPosition()).toEqual [10, 11]
       atom.commands.dispatch miniEditor.element, "core:cancel"
 
       atom.commands.dispatch autocomplete.element, 'core:cancel'
       expect(editor.lineTextForBufferRow(10)).toBe "extra:S:extra"
-      expect(editor.getCursorBufferPosition()).toEqual [10,7]
+      expect(editor.getCursorBufferPosition()).toEqual [10, 7]
 
     it "restores the original buffer contents even if there was an additional operation after autocomplete attached (regression)", ->
-      editor.getBuffer().insert([10,0] ,"extra:s:extra")
-      editor.setCursorBufferPosition([10,7])
+      editor.getBuffer().insert([10, 0], "extra:s:extra")
+      editor.setCursorBufferPosition([10, 7])
       autocomplete.attach()
 
       editor.getBuffer().append('hi')
@@ -385,8 +385,8 @@ describe "AutocompleteView", ->
 
   describe 'move-up event', ->
     it "highlights the previous match and replaces the selection with it", ->
-      editor.getBuffer().insert([10,0] ,"extra:t:extra")
-      editor.setCursorBufferPosition([10,6])
+      editor.getBuffer().insert([10, 0], "extra:t:extra")
+      editor.setCursorBufferPosition([10, 6])
       autocomplete.attach()
 
       atom.commands.dispatch miniEditor.element, "core:move-up"
@@ -403,8 +403,8 @@ describe "AutocompleteView", ->
 
   describe 'move-down event', ->
     it "highlights the next match and replaces the selection with it", ->
-      editor.getBuffer().insert([10,0] ,"extra:s:extra")
-      editor.setCursorBufferPosition([10,7])
+      editor.getBuffer().insert([10, 0], "extra:s:extra")
+      editor.setCursorBufferPosition([10, 7])
       autocomplete.attach()
 
       atom.commands.dispatch miniEditor.element, "core:move-down"
@@ -419,7 +419,7 @@ describe "AutocompleteView", ->
 
   describe "when a match is clicked in the match list", ->
     it "selects and confirms the match", ->
-      editor.getBuffer().insert([10,0] ,"t")
+      editor.getBuffer().insert([10, 0], "t")
       editor.setCursorBufferPosition([10, 0])
       autocomplete.attach()
 
@@ -438,8 +438,8 @@ describe "AutocompleteView", ->
 
     describe "when text is removed from the mini-editor", ->
       it "reloads the match list based on the mini-editor's text", ->
-        editor.getBuffer().insert([10,0], "t")
-        editor.setCursorBufferPosition([10,0])
+        editor.getBuffer().insert([10, 0], "t")
+        editor.setCursorBufferPosition([10, 0])
         autocomplete.attach()
 
         expect(autocomplete.list.find('li').length).toBe 8
@@ -452,8 +452,8 @@ describe "AutocompleteView", ->
 
     describe "when the text contains only word characters", ->
       it "narrows the list of completions with the fuzzy match algorithm", ->
-        editor.getBuffer().insert([10,0] ,"t")
-        editor.setCursorBufferPosition([10,0])
+        editor.getBuffer().insert([10, 0], "t")
+        editor.setCursorBufferPosition([10, 0])
         autocomplete.attach()
 
         expect(autocomplete.list.find('li').length).toBe 8
@@ -475,8 +475,8 @@ describe "AutocompleteView", ->
 
     describe "when a non-word character is typed in the mini-editor", ->
       it "immediately confirms the current completion choice and inserts that character into the buffer", ->
-        editor.getBuffer().insert([10,0] ,"t")
-        editor.setCursorBufferPosition([10,0])
+        editor.getBuffer().insert([10, 0], "t")
+        editor.setCursorBufferPosition([10, 0])
         autocomplete.attach()
         expect(editor.getOverlayDecorations().length).toBe 1
 

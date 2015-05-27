@@ -21,8 +21,8 @@ module.exports =
       autocompleteView = new AutocompleteView(editor)
       @autocompleteViewsByEditor.set(editor, autocompleteView)
 
-      disposable = new Disposable => autocompleteView.destroy()
-      @deactivationDisposables.add editor.onDidDestroy => disposable.dispose()
+      disposable = new Disposable -> autocompleteView.destroy()
+      @deactivationDisposables.add editor.onDidDestroy -> disposable.dispose()
       @deactivationDisposables.add disposable
 
     getAutocompleteView = (editorElement) =>
