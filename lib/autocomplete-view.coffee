@@ -128,7 +128,7 @@ class AutocompleteView extends SelectListView
     if (prefix.length + suffix.length) > 0
       regex = new RegExp("^#{prefix}.+#{suffix}$", "i")
       currentWord = prefix + @editor.getSelectedText() + suffix
-      for word in @wordList when regex.test(word) and word != currentWord
+      for word in @wordList when regex.test(word) and word isnt currentWord
         {prefix, suffix, word}
     else
       {word, prefix, suffix} for word in @wordList
