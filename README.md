@@ -1,4 +1,4 @@
-# Autocomplete package [![Build Status](https://travis-ci.org/atom/autocomplete.svg?branch=master)](https://travis-ci.org/atom/autocomplete)
+# Autocomplete (Deprecated) [![Build Status](https://travis-ci.org/atom/autocomplete.svg?branch=master)](https://travis-ci.org/atom/autocomplete)
 
 **This package has been replaced in Atom core with [autocomplete-plus](https://github.com/atom/autocomplete-plus)**
 
